@@ -1,0 +1,5 @@
+export enum Provider {
+    CUSTOM_PROVIDER,
+    GOOGLE_PROVIDER, 
+    FACEBOOK_PROVIDER
+}

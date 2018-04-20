@@ -1,0 +1,49 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Auth</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+<ion-grid *ngIf="!isUserSignIn(); else signIn">
+<ion-row>
+  <ion-col> <h4>SignIn using social media</h4> </ion-col>
+</ion-row>
+
+<ion-row>
+  <ion-col><button ion-button (click)="gglSignIn()"> Google </button></ion-col>
+  <ion-col><button ion-button (click)="fbSignIn()"> Facebook </button></ion-col>  
+</ion-row>
+
+<ion-row>
+  <ion-col> <h4>SignIn or SignUp using email</h4> </ion-col>
+</ion-row>
+
+<ion-row>
+  <ion-col> <button ion-button (click)="ctSignIn()">SignIn</button> </ion-col>
+  <ion-col> <button ion-button>SignUp</button></ion-col>  
+</ion-row>
+
+</ion-grid>
+
+<ng-template #signIn>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-title>
+          user sign in
+        </ion-title>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col>
+          <button (click)="signOut()" ion-button>SignOut</button>
+        </ion-col>
+      </ion-row>
+  </ion-grid>
+</ng-template>
+</ion-content>

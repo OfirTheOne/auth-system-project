@@ -1,5 +1,5 @@
 {
-  "name": "firebase-auth-project",
+  "name": "auth-system-project",
   "version": "0.0.1",
   "author": "Ionic Framework",
   "homepage": "http://ionicframework.com/",
@@ -27,6 +27,8 @@
     "@ionic/storage": "2.1.3",
     "ionic-angular": "3.9.2",
     "ionicons": "3.0.0",
+    "moment": "^2.22.0",
+    "promise-polyfill": "^7.1.2",
     "rxjs": "5.5.8",
     "sw-toolbox": "3.6.0",
     "zone.js": "0.8.20"
