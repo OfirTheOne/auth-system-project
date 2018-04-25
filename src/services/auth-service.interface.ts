@@ -1,13 +1,13 @@
 import { Provider } from './../models/provider.enum';
-import { Profile } from './../models/profile.interface';
+import { UserDataBase } from './../models/user-data-base.interface';
 import { HttpHeaders } from '@angular/common/http';
 
 
 export interface AuthService {
-    onSignIn: (params?) => any,
+    onSignIn: (params?) => Promise<UserDataBase>,
     onSignOut: () => any,
     isSignIn: () => boolean,
-    getProfile: () => Profile,
+    getProfile: () => UserDataBase,
     getProvider: () => Provider,
     getAuthHeader: () => HttpHeaders
 }

@@ -1,3 +1,4 @@
+import { ServerResponse } from './../../models/custom-auth-models/server-response.interface';
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs/Subject";
 import { Subscription } from "rxjs/Subscription";
@@ -7,8 +8,11 @@ import { GGL_CLIENT_ID, GGL_API_KEY } from "../../data/auth-data"
 
 import { UserApiService } from "../user-api/user-api.service";
 import { AuthService } from "../auth-service.interface";
-import { Profile } from "../../models/profile.interface";
+
+import { UserDataBase } from "../../models/user-data-base.interface";
 import { SignInResult } from "../../models/google-auth-models/sign-in-result.interface";
+import { AuthResponse } from '../../models/custom-auth-models/auth-response.interface';
+
 import { UserAuthData } from "../../models/google-auth-models/user-auth-data.interface";
 import { Provider } from "../../models/provider.enum";
 
@@ -28,8 +32,11 @@ const EXTRA_SCOPES = "https://www.googleapis.com/auth/plus.login https://www.goo
 @Injectable()
 export class GoogleAuthService implements AuthService {
 
+
+
     // reasurce
     private auth2;
+    private udb: UserDataBase;
     private isAuth2Init = false;
     private auth2InitEvent: Subject<void> = new Subject();
     private delayedSignInOnLoadEvent: Subject<void> = new Subject();
@@ -43,19 +50,13 @@ export class GoogleAuthService implements AuthService {
          */
         // prevent duplicate code
         const setAuthRes = () => {
-            let auth_flag = false, client_flag = false;
-
-            window['gapi'].load('auth2', () => {
+            // listening to both client and auth2 objects.
+            window['gapi'].load('client:auth2', () => {
                 this.auth2 = window['gapi'].auth2.init({
                     client_id: GGL_CLIENT_ID,
                     fetch_basic_profile: true,
                     scope: `profile ${EXTRA_SCOPES}`
                 });
-                auth_flag = true;
-                dispatchAuthRes(auth_flag, client_flag);
-
-            });
-            window['gapi'].load('client', () => {
                 window['gapi'].client.init({
                     'apiKey': GGL_API_KEY,
                     'clientId': GGL_CLIENT_ID,
@@ -63,22 +64,16 @@ export class GoogleAuthService implements AuthService {
                     'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
                 });
 
-                const authIns = window['gapi'].auth2.getAuthInstance();
-                // doc :
-                authIns.isSignedIn.listen(() => {
-                    console.log('isSignedIn.listen - true');
+                const authInstance = window['gapi'].auth2.getAuthInstance();
+                authInstance.isSignedIn.listen(() => {
+                    console.log('isSignedIn.listen');
+                    this.userApi.getUserData(this.getAuthHeader());
                     this.delayedSignInOnLoadEvent.next();
                 });
-                client_flag = true;
-                dispatchAuthRes(auth_flag, client_flag);
-            });
-        }
 
-        const dispatchAuthRes = (a, c) => {
-            if (a && c) {
                 this.isAuth2Init = true;
                 this.auth2InitEvent.next();
-            }
+            });
         }
 
         // if the plugin has been loaded
@@ -100,17 +95,26 @@ export class GoogleAuthService implements AuthService {
 
     //#region :: public AuthService API mathods
 
-    public async onSignIn(): Promise<SignInResult> {
+    public async onSignIn(): Promise<UserDataBase> {
+
+        // auth2 is init and the user signed out.
         if (this.isAuth2Init && !this.auth2.isSignedIn.get()) {
+            // sign in the user using google services.
             const res = await this.auth2.signIn();
             console.log('User signed in.');
-            const signInResult: SignInResult = {
-                profile: this.parseToProfile(res.w3),
-                authData: res.Zi
-            }
-            const serverRes = await this.userApi.postSignInUser(Provider.GOOGLE_PROVIDER, { idToken: signInResult.authData.id_token });
-            console.log(serverRes);
-            return signInResult;
+
+            const tok = res.Zi.id_token
+
+            // sign in the user using server.
+            const serverRes = await this.userApi.postSignInUser(Provider.GOOGLE_PROVIDER, { idToken: tok });
+
+           // authenticate the server response. / validating the returned user id.
+           this.authenticateServerResponse(serverRes.body);
+
+            // saving the signed user data in the service.
+            this.udb = serverRes.body.data.user;
+
+            return this.udb;
         } else {
             throw new Error('the user is sign in or the auth2 object is\'nt initialized');
         }
@@ -120,6 +124,9 @@ export class GoogleAuthService implements AuthService {
         if (this.isAuth2Init && this.auth2.isSignedIn.get()) {
             await this.auth2.signOut(); // this method do have no return value
             console.log('User signed out.');
+
+            await this.userApi.deleteUserCurToken(this.getAuthHeader());
+        
         } else {
             throw new Error('the user is\'nt sign in or the auth2 object is\'nt initialized');
         }
@@ -137,12 +144,9 @@ export class GoogleAuthService implements AuthService {
         }
     }
 
-    public getProfile(): undefined | Profile {
+    public getProfile(): undefined | UserDataBase {
         if (this.isAuth2Init && this.auth2.isSignedIn.get()) {
-            const profile = this.auth2.currentUser.get().getBasicProfile();
-            console.log(profile);
-            console.log(this.getUserAuthData());
-            return this.parseToProfile(profile);
+            return this.udb;
         } else {
             console.log('the user is\'nt sign in');
         }
@@ -154,7 +158,7 @@ export class GoogleAuthService implements AuthService {
 
     public getAuthHeader(): HttpHeaders {
         const tok = this.getUserAuthData().id_token;
-        return new HttpHeaders({ 'x-auth': tok })
+        return new HttpHeaders({ 'x-auth': tok, 'x-provider': 'google' })
     }
 
     //#endregion 
@@ -191,18 +195,6 @@ export class GoogleAuthService implements AuthService {
 
     //#region :: private methods
 
-    private parseToProfile(profileObj): Profile {
-        const profile: Profile = {
-            id: profileObj.getId(),
-            fullName: profileObj.getName(),
-            givenName: profileObj.getGivenName(),
-            familyName: profileObj.getFamilyName(),
-            imageUrl: profileObj.getImageUrl(),
-            email: profileObj.getEmail(),
-            provider: Provider.GOOGLE_PROVIDER
-        }
-        return profile;
-    }
 
     private getUserAuthData(): undefined | UserAuthData {
         // doc : https://developers.google.com/identity/sign-in/web/reference#googleauthcurrentuserget
@@ -215,6 +207,14 @@ export class GoogleAuthService implements AuthService {
         }
     }
 
+    private authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
+        const { authValue } = res.data;
+        const authuid = this.auth2.currentUser.get().getBasicProfile().getId();
+        return authValue === authuid;
+    }
+
     //#endregion ******
+
+
 
 }

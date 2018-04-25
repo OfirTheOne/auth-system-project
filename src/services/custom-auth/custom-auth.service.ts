@@ -2,24 +2,28 @@ import { Injectable } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
 import * as moment from 'moment';
 
-import { AuthService } from '../auth-service.interface';
-import { Profile } from '../../models/profile.interface';
-import { Provider } from '../../models/provider.enum';
 import { UserApiService } from '../user-api/user-api.service';
+
+import { AuthService } from '../auth-service.interface';
+import { UserDataBase } from '../../models/user-data-base.interface';
+import { Provider } from '../../models/provider.enum';
 
 @Injectable()
 export class CustomAuthService implements AuthService {
 
+    private udb: UserDataBase;
+
     constructor(private userApi: UserApiService) { }
 
-    //#region - public methods
-    public async onSignIn(params: signInParams): Promise<boolean> {
+    //#region - user actions / talk with server
+    public async onSignIn(params: signInParams): Promise<UserDataBase> {
         let res;
         try {
             res = await this.userApi.postSignInUser(Provider.CUSTOM_PROVIDER, params.data);
             console.log(res, res.body.data.tokenData);
             this.setSession(res.body.data.tokenData);
-            return true;
+            this.udb = res.body.data.user; 
+            return this.udb;
         } catch (e) {
             console.log(e);
             throw e;
@@ -27,20 +31,24 @@ export class CustomAuthService implements AuthService {
 
     }
 
-    public async onSignOut(): Promise<boolean> {
+    public async onSignOut(): Promise<void> {
         const headers = this.getAuthHeader();
-        // firs remove tken from local storage than removing from the db, UX consideration
+
+        // first token removeing from local storage than removing from the db, UX consideration
+
         this.removeTokenFromLocal();
         try {
             const res = await this.userApi.deleteUserCurToken(headers);
             console.log(res);
-            return true;
+            
         } catch (e) {
             console.log(e);
             throw e;
         }
 
     }
+
+    //#endregion
 
     public isSignIn(): boolean {
         const tokenStatus = moment().isBefore(this.getExpiration());
@@ -50,19 +58,18 @@ export class CustomAuthService implements AuthService {
         return tokenStatus;
     }
 
-    public getProfile(): Profile {
-        return null;
+    public getProfile(): UserDataBase {
+        return this.udb;
     }
 
     public getProvider(): Provider {
-
         return Provider.CUSTOM_PROVIDER;
     }
 
     public getAuthHeader(): HttpHeaders {
-        return new HttpHeaders({ 'x-auth': this.getToken() })
+        return new HttpHeaders({ 'x-auth': this.getToken(), 'x-provider': 'custom' })
     }
-    //#endregion
+    
 
     //#region - private methods - token related 
     private getToken() {

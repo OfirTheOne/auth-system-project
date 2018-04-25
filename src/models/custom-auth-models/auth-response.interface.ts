@@ -1,10 +1,10 @@
-import { User } from "./user.interface";
+import { UserDataBase } from "../user-data-base.interface";
 
 export interface AuthResponse {
     tokenData?: {
         token: string,
         expDate: number
     },
-    userId?: string,
-    user: User
+    authValue ?: string,
+    user: UserDataBase
 }

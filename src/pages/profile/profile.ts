@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AgentAuthService } from '../../services/agent-auth.service';
-import { Profile } from '../../models/profile.interface';
+import { UserDataBase } from '../../models/user-data-base.interface';
 
 /**
  * Generated class for the ProfilePage page.
@@ -28,7 +28,7 @@ export class ProfilePage {
     return this.agentAuth.isSignIn();
   }
 
-  getProfile(): Profile {
+  getProfile(): UserDataBase {
     if(this.agentAuth.isSignIn()) {
       return this.agentAuth.getProfile();
     }

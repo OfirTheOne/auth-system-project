@@ -12,17 +12,17 @@
   <ion-grid *ngIf="isSignIn(); else notSignIn">
     <ion-row>
       <ion-col>
-        <ion-title>Hello {{getProfile().name}} !</ion-title>
+        <ion-title>Hello {{getProfile().userName}} !</ion-title>
       </ion-col>
     </ion-row>
     <ion-row>
       <ion-col>
         <ion-list>
           <ion-item>
-            First name : {{getProfile().givenName}}
+            First name : {{getProfile().personalData.firstName}}
           </ion-item>
           <ion-item>
-            Last name : {{getProfile().familyName}}
+            Last name : {{getProfile().personalData.lastName}}
           </ion-item>
           <ion-item>
             Email : {{getProfile().email}}

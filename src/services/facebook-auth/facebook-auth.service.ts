@@ -1,9 +1,10 @@
+import { UserApiService } from './../user-api/user-api.service';
+import { UserDataBase } from './../../models/user-data-base.interface';
 import { AuthResponse } from './../../models/custom-auth-models/auth-response.interface';
 import { Injectable } from "@angular/core";
 // import { FB_APP_ID } from "../../data/auth-data"
 
 import { AuthService } from "../auth-service.interface";
-import { Profile } from "../../models/profile.interface";
 import { Provider } from "../../models/provider.enum";
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
@@ -18,9 +19,9 @@ export class FacebookAuthService implements AuthService {
     private fbAuthInitEvent: Subject<void> = new Subject();
     private isfbAuthInit = false;
 
-    private userProfile: Profile;
+    private udb: UserDataBase;
 
-    constructor() {
+    constructor(private userApi: UserApiService) {
         this.facebookAuthInit();
     }
 
@@ -35,10 +36,17 @@ export class FacebookAuthService implements AuthService {
         const res = await this.fbAuth.login(undefined, { scope: 'public_profile,email' });
         console.log(res);
         if (res != undefined && res.status === 'connected') {
-            await this.setProfileData();
+
+            // sign in the user using server.
+            const serverRes = await this.userApi.postSignInUser(Provider.FACEBOOK_PROVIDER, { idToken: '' });
+            this.udb = serverRes.body.data.user;
+            return this.udb;
+
+            // await this.setProfileData();
         } else {
             console.log('The person is not logged into this app or we are unable to tell.')
         }
+        return null;
     };
 
     public async onSignOut() {
@@ -47,7 +55,7 @@ export class FacebookAuthService implements AuthService {
          *  https://developers.facebook.com/docs/facebook-login/web#logout
          */
         const res = await this.fbAuth.logout();
-        this.userProfile = undefined;
+        this.udb = undefined;
         console.log(res);
     }
 
@@ -66,8 +74,8 @@ export class FacebookAuthService implements AuthService {
         }
     }
 
-    public getProfile(): Profile {
-        return this.userProfile;
+    public getProfile(): UserDataBase {
+        return this.udb;
     }
 
     public getProvider(): Provider {
@@ -75,6 +83,7 @@ export class FacebookAuthService implements AuthService {
     }
 
     public getAuthHeader(): HttpHeaders {
+        // return x-provider and x-auth
         return null;
     }
     //#endregion
@@ -119,9 +128,11 @@ export class FacebookAuthService implements AuthService {
             this.isfbAuthInit = true;
             this.fbAuthInitEvent.next();
 
+            /*
             if (this.isSignIn()) {
                 this.setProfileData();
             }
+            */
         };
 
         (function (d, s, id) {
@@ -133,11 +144,13 @@ export class FacebookAuthService implements AuthService {
         }(document, 'script', 'facebook-jssdk'));
     }
 
+    /*
+    
     private async setProfileData() {
-        /**
-         * doc  : 
-         *  https://developers.facebook.com/docs/graph-api/reference/user/#Reading
-         */
+        
+         // doc  : 
+         //  https://developers.facebook.com/docs/graph-api/reference/user/#Reading
+        
         const res = await this.fbAuth.api('/me');
         console.log(res);
         this.userProfile = this.parseToProfile(res);
@@ -155,16 +168,18 @@ export class FacebookAuthService implements AuthService {
         }
         return profile;
     }
-    
+
+    */
+
     //#endregion
 }
 
 interface FBAuthResponse {
-        status: 'connected',
-        authResponse: {
-            accessToken: '...',
-            expiresIn:'...',
-            signedRequest:'...',
-            userID:'...'
-        }   
+    status: 'connected',
+    authResponse: {
+        accessToken: '...',
+        expiresIn: '...',
+        signedRequest: '...',
+        userID: '...'
+    }
 }
