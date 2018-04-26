@@ -41,7 +41,6 @@ export class GoogleAuthService implements AuthService {
     private auth2InitEvent: Subject<void> = new Subject();
     private delayedSignInOnLoadEvent: Subject<void> = new Subject();
 
-
     constructor(private userApi: UserApiService) {
         /**
          * doc : 
