@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({'extended': true}));
 app.use(bodyParser.json());
 app.use(cors());
 
-
+/*
 if(process.env.NODE_ENV) {
     window.myEnv = {
         FB_APP_ID : process.env.FB_APP_ID,
@@ -19,6 +19,7 @@ if(process.env.NODE_ENV) {
 
     } 
 }
+*/
 
 app.use(function(res, res, next) {
     res.header("Access-Control-Allow-Orgin", "*");
