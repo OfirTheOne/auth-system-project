@@ -7,6 +7,7 @@ import { UserApiService } from '../user-api/user-api.service';
 import { AuthService } from '../auth-service.interface';
 import { UserDataBase } from '../../models/user-data-base.interface';
 import { Provider } from '../../models/provider.enum';
+import { AuthResponse } from '../../models/custom-auth-models/auth-response.interface';
 
 @Injectable()
 export class CustomAuthService implements AuthService {
@@ -16,14 +17,14 @@ export class CustomAuthService implements AuthService {
     constructor(private userApi: UserApiService) { }
 
     //#region - user actions / talk with server
-    public async onSignIn(params: signInParams): Promise<UserDataBase> {
+    public async onSignIn(params: signInParams): Promise<AuthResponse> {
         let res;
         try {
             res = await this.userApi.postSignInUser(Provider.CUSTOM_PROVIDER, params.data);
             console.log(res, res.body.data.tokenData);
             this.setSession(res.body.data.tokenData);
             this.udb = res.body.data.user; 
-            return this.udb;
+            return res.body.data;
         } catch (e) {
             console.log(e);
             throw e;
@@ -55,7 +56,7 @@ export class CustomAuthService implements AuthService {
         if (!tokenStatus) {
             this.removeTokenFromLocal();
         }
-        return tokenStatus;
+        return tokenStatus && this.udb != undefined;
     }
 
     public getProfile(): UserDataBase {

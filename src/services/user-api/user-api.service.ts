@@ -45,14 +45,14 @@ export class UserApiService {
     }
 
     public async getUserData(headers: HttpHeaders)
-        : Promise<Object> {
+        : Promise<AuthResponse> {
         console.log(`getUserData(${headers})`);
         const queryUrl = API_URL + this.curSubRoute + 'me/';
         try {
-            const res = await this.httpClient.get(queryUrl,
+            const res = await this.httpClient.get<ServerResponse<AuthResponse>>(queryUrl,
                 { headers, observe: 'response' }).toPromise();
             console.log(res);
-            return res;
+            return res.body.data;
         } catch (e) {
             throw e;
         }

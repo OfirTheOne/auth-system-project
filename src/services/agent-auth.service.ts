@@ -42,10 +42,12 @@ export class AgentAuthService {
             f_init = true;
             this.chackIsAuthResInit(g_init, f_init, true);
         });
+        /*
         this.google.delayedSignInOnLoadEventSubscribe(() => {
             this.userStatusChangeEvent.next();
             this.setStrategy(Provider.GOOGLE_PROVIDER);
         });
+        */
     }
 
     //#region - user actions / talk with server

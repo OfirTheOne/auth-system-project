@@ -3,13 +3,6 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Loading } from 'ionic-angular';
 import { Provider } from '../../models/provider.enum';
 
-/**
- * Generated class for the AuthPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
   selector: 'page-auth',
@@ -38,7 +31,8 @@ export class AuthPage {
     try {
 
       this.agentAuthService.setStrategy(Provider.GOOGLE_PROVIDER);
-      await this.agentAuthService.onSignIn();
+     const res =  await this.agentAuthService.onSignIn();
+     console.log(res);
     } catch (ex) {
       console.log(ex);
     }
@@ -62,7 +56,8 @@ export class AuthPage {
     try {
       this.agentAuthService.setStrategy(Provider.CUSTOM_PROVIDER);
       const params = {};
-      await this.agentAuthService.onSignIn(params);
+      const res = await this.agentAuthService.onSignIn(params);
+      console.log(res);
     } catch (ex) {
       console.log(ex);
     }

@@ -27,7 +27,7 @@ export class FacebookAuthService implements AuthService {
 
     //#region :: public AuthService API mathods
 
-    public async onSignIn() {
+    public async onSignIn(): Promise<AuthResponse> {
         /**
          * doc : 
          *  https://developers.facebook.com/docs/reference/javascript/FB.login/v2.12
@@ -40,7 +40,7 @@ export class FacebookAuthService implements AuthService {
             // sign in the user using server.
             const serverRes = await this.userApi.postSignInUser(Provider.FACEBOOK_PROVIDER, { idToken: '' });
             this.udb = serverRes.body.data.user;
-            return this.udb;
+            return serverRes.body.data;
 
             // await this.setProfileData();
         } else {

@@ -48,6 +48,7 @@ export class GoogleAuthService implements AuthService {
          *  https://developers.google.com/identity/protocols/OAuth2UserAgent#creatingclient
          */
         // prevent duplicate code
+        let dispatchDelayedSignIn = false;
         const setAuthRes = () => {
             // listening to both client and auth2 objects.
             window['gapi'].load('client:auth2', () => {
@@ -64,12 +65,20 @@ export class GoogleAuthService implements AuthService {
                 });
 
                 const authInstance = window['gapi'].auth2.getAuthInstance();
-                authInstance.isSignedIn.listen(() => {
+                /*
+                authInstance.isSignedIn.listen(async (param) => {
                     console.log('isSignedIn.listen');
-                    this.userApi.getUserData(this.getAuthHeader());
-                    this.delayedSignInOnLoadEvent.next();
+                    console.log(param);
+                    //dispatch the event delayedSignInOnLoadEvent only whan this service constructed
+                    if(!dispatchDelayedSignIn) {   
+                        this.delayedSignInOnLoadEvent.next();
+                        dispatchDelayedSignIn = true;
+                    }
+                        const tok = this.getUserAuthData().id_token;
+                        return this.signInToServer(tok);
+                    
                 });
-
+                */
                 this.isAuth2Init = true;
                 this.auth2InitEvent.next();
             });
@@ -94,38 +103,44 @@ export class GoogleAuthService implements AuthService {
 
     //#region :: public AuthService API mathods
 
-    public async onSignIn(): Promise<UserDataBase> {
+    public async onSignIn(): Promise<AuthResponse> {
 
-        // auth2 is init and the user signed out.
-        if (this.isAuth2Init && !this.auth2.isSignedIn.get()) {
+        // auth2 is init 
+        if (this.isAuth2Init) {
+
             // sign in the user using google services.
             const res = await this.auth2.signIn();
             console.log('User signed in.');
-
-            const tok = res.Zi.id_token
-
-            // sign in the user using server.
-            const serverRes = await this.userApi.postSignInUser(Provider.GOOGLE_PROVIDER, { idToken: tok });
-
-           // authenticate the server response. / validating the returned user id.
-           this.authenticateServerResponse(serverRes.body);
-
-            // saving the signed user data in the service.
-            this.udb = serverRes.body.data.user;
-
-            return this.udb;
+            const tok = res.Zi.id_token;
+            return await this.signInToServer(tok);
         } else {
-            throw new Error('the user is sign in or the auth2 object is\'nt initialized');
+            throw new Error('the auth2 object is\'nt initialized');
         }
+    }
+
+    private async signInToServer(token: string) {
+
+        // sign in the user using server.
+        const serverRes = await this.userApi.postSignInUser(Provider.GOOGLE_PROVIDER, { idToken: token });
+
+        // authenticate the server response. / validating the returned user id.
+        this.authenticateServerResponse(serverRes.body);
+
+        // saving the signed user data in the service.
+        this.udb = serverRes.body.data.user;
+
+        return serverRes.body.data;
     }
 
     public async onSignOut(): Promise<void> {
         if (this.isAuth2Init && this.auth2.isSignedIn.get()) {
+
+            const headers = this.getAuthHeader();
             await this.auth2.signOut(); // this method do have no return value
             console.log('User signed out.');
 
-            await this.userApi.deleteUserCurToken(this.getAuthHeader());
-        
+            await this.userApi.deleteUserCurToken(headers);
+
         } else {
             throw new Error('the user is\'nt sign in or the auth2 object is\'nt initialized');
         }
@@ -137,7 +152,7 @@ export class GoogleAuthService implements AuthService {
      */
     public isSignIn(): boolean {
         if (this.isAuth2Init) {
-            return this.auth2.isSignedIn.get();
+            return (this.auth2.isSignedIn.get() && this.udb != undefined);
         } else {
             return false;
         }

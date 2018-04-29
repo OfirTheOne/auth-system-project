@@ -4,6 +4,62 @@ webpackJsonp([2],{
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ProfilePage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_agent_auth_service__ = __webpack_require__(81);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+/**
+ * Generated class for the ProfilePage page.
+ *
+ * See https://ionicframework.com/docs/components/#navigation for more info on
+ * Ionic pages and navigation.
+ */
+var ProfilePage = /** @class */ (function () {
+    function ProfilePage(navCtrl, navParams, agentAuth) {
+        this.navCtrl = navCtrl;
+        this.navParams = navParams;
+        this.agentAuth = agentAuth;
+    }
+    ProfilePage.prototype.ionViewDidLoad = function () {
+        console.log('ionViewDidLoad ProfilePage');
+    };
+    ProfilePage.prototype.isSignIn = function () {
+        return this.agentAuth.isSignIn();
+    };
+    ProfilePage.prototype.getProfile = function () {
+        if (this.agentAuth.isSignIn()) {
+            return this.agentAuth.getProfile();
+        }
+    };
+    ProfilePage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-profile',template:/*ion-inline-start:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/'<ion-header>\n\n  <ion-navbar>\n    <ion-title>Profile</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n  <ion-grid *ngIf="isSignIn(); else notSignIn">\n    <ion-row>\n      <ion-col>\n        <ion-title>Hello {{getProfile().userName}} !</ion-title>\n      </ion-col>\n    </ion-row>\n    <ion-row>\n      <ion-col>\n        <ion-list>\n          <ion-item>\n            First name : {{getProfile().personalData?.firstName}}\n          </ion-item>\n          <ion-item>\n            Last name : {{getProfile().personalData?.lastName}}\n          </ion-item>\n          <ion-item>\n            Email : {{getProfile().email}}\n          </ion-item>\n          <ion-item>\n            ID : {{getProfile().id}}\n          </ion-item>\n        </ion-list>\n      </ion-col>\n    </ion-row>\n  </ion-grid>\n\n  <ng-template #notSignIn>\n      <ion-grid>\n        <ion-row>\n          <ion-col>\n            <ion-title>No user sign in</ion-title>\n          </ion-col>\n        </ion-row>\n      </ion-grid>\n    </ng-template>\n\n</ion-content>'/*ion-inline-end:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/,
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2__services_agent_auth_service__["a" /* AgentAuthService */]])
+    ], ProfilePage);
+    return ProfilePage;
+}());
+
+//# sourceMappingURL=profile.js.map
+
+/***/ }),
+
+/***/ 105:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AuthPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__services_agent_auth_service__ = __webpack_require__(81);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(0);
@@ -57,12 +113,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 
 
 
-/**
- * Generated class for the AuthPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 var AuthPage = /** @class */ (function () {
     function AuthPage(navCtrl, navParams, loadingCtrl, agentAuthService) {
         this.navCtrl = navCtrl;
@@ -81,7 +131,7 @@ var AuthPage = /** @class */ (function () {
     };
     AuthPage.prototype.gglSignIn = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var ex_1;
+            var res, ex_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -89,7 +139,8 @@ var AuthPage = /** @class */ (function () {
                         this.agentAuthService.setStrategy(__WEBPACK_IMPORTED_MODULE_3__models_provider_enum__["a" /* Provider */].GOOGLE_PROVIDER);
                         return [4 /*yield*/, this.agentAuthService.onSignIn()];
                     case 1:
-                        _a.sent();
+                        res = _a.sent();
+                        console.log(res);
                         return [3 /*break*/, 3];
                     case 2:
                         ex_1 = _a.sent();
@@ -130,7 +181,7 @@ var AuthPage = /** @class */ (function () {
     };
     AuthPage.prototype.ctSignUp = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var params, ex_3;
+            var params, res, ex_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -139,7 +190,8 @@ var AuthPage = /** @class */ (function () {
                         params = {};
                         return [4 /*yield*/, this.agentAuthService.onSignIn(params)];
                     case 1:
-                        _a.sent();
+                        res = _a.sent();
+                        console.log(res);
                         return [3 /*break*/, 3];
                     case 2:
                         ex_3 = _a.sent();
@@ -198,62 +250,6 @@ var AuthPage = /** @class */ (function () {
 
 /***/ }),
 
-/***/ 105:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ProfilePage; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_agent_auth_service__ = __webpack_require__(81);
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-
-
-/**
- * Generated class for the ProfilePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-var ProfilePage = /** @class */ (function () {
-    function ProfilePage(navCtrl, navParams, agentAuth) {
-        this.navCtrl = navCtrl;
-        this.navParams = navParams;
-        this.agentAuth = agentAuth;
-    }
-    ProfilePage.prototype.ionViewDidLoad = function () {
-        console.log('ionViewDidLoad ProfilePage');
-    };
-    ProfilePage.prototype.isSignIn = function () {
-        return this.agentAuth.isSignIn();
-    };
-    ProfilePage.prototype.getProfile = function () {
-        if (this.agentAuth.isSignIn()) {
-            return this.agentAuth.getProfile();
-        }
-    };
-    ProfilePage = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-profile',template:/*ion-inline-start:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/'<ion-header>\n\n  <ion-navbar>\n    <ion-title>Profile</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n  <ion-grid *ngIf="isSignIn(); else notSignIn">\n    <ion-row>\n      <ion-col>\n        <ion-title>Hello {{getProfile().userName}} !</ion-title>\n      </ion-col>\n    </ion-row>\n    <ion-row>\n      <ion-col>\n        <ion-list>\n          <ion-item>\n            First name : {{getProfile().personalData.firstName}}\n          </ion-item>\n          <ion-item>\n            Last name : {{getProfile().personalData.lastName}}\n          </ion-item>\n          <ion-item>\n            Email : {{getProfile().email}}\n          </ion-item>\n          <ion-item>\n            ID : {{getProfile().id}}\n          </ion-item>\n        </ion-list>\n      </ion-col>\n    </ion-row>\n  </ion-grid>\n\n  <ng-template #notSignIn>\n      <ion-grid>\n        <ion-row>\n          <ion-col>\n            <ion-title>No user sign in</ion-title>\n          </ion-col>\n        </ion-row>\n      </ion-grid>\n    </ng-template>\n\n</ion-content>'/*ion-inline-end:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/,
-        }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2__services_agent_auth_service__["a" /* AgentAuthService */]])
-    ], ProfilePage);
-    return ProfilePage;
-}());
-
-//# sourceMappingURL=profile.js.map
-
-/***/ }),
-
 /***/ 117:
 /***/ (function(module, exports) {
 
@@ -276,11 +272,11 @@ webpackEmptyAsyncContext.id = 117;
 
 var map = {
 	"../pages/auth/auth.module": [
-		410,
+		411,
 		1
 	],
 	"../pages/profile/profile.module": [
-		411,
+		410,
 		0
 	]
 };
@@ -378,7 +374,7 @@ var CustomAuthService = /** @class */ (function () {
                         console.log(res, res.body.data.tokenData);
                         this.setSession(res.body.data.tokenData);
                         this.udb = res.body.data.user;
-                        return [2 /*return*/, this.udb];
+                        return [2 /*return*/, res.body.data];
                     case 2:
                         e_1 = _a.sent();
                         console.log(e_1);
@@ -420,7 +416,7 @@ var CustomAuthService = /** @class */ (function () {
         if (!tokenStatus) {
             this.removeTokenFromLocal();
         }
-        return tokenStatus;
+        return tokenStatus && this.udb != undefined;
     };
     CustomAuthService.prototype.getProfile = function () {
         return this.udb;
@@ -470,7 +466,7 @@ var CustomAuthService = /** @class */ (function () {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return GOOGLE_API_KEY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SERVER_API_URL; });
 var SERVER_API_URL = "https://frozen-depths-97143.herokuapp.com/";
-var FACEBOOK_APP_ID = "193767451426342";
+var FACEBOOK_APP_ID = "121800088679838";
 var GOOGLE_CLIENT_ID = "185191598431-iloo5lp0ne8jshgj5cblusuglr4bv2rt.apps.googleusercontent.com";
 var GOOGLE_API_KEY = "AIzaSyAacSp1HggwNuJQvmW7WE374Gzs3-ETDjU";
 
@@ -566,6 +562,7 @@ var GoogleAuthService = /** @class */ (function () {
          *  https://developers.google.com/identity/protocols/OAuth2UserAgent#creatingclient
          */
         // prevent duplicate code
+        var dispatchDelayedSignIn = false;
         var setAuthRes = function () {
             // listening to both client and auth2 objects.
             window['gapi'].load('client:auth2', function () {
@@ -581,11 +578,20 @@ var GoogleAuthService = /** @class */ (function () {
                     'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
                 });
                 var authInstance = window['gapi'].auth2.getAuthInstance();
-                authInstance.isSignedIn.listen(function () {
+                /*
+                authInstance.isSignedIn.listen(async (param) => {
                     console.log('isSignedIn.listen');
-                    _this.userApi.getUserData(_this.getAuthHeader());
-                    _this.delayedSignInOnLoadEvent.next();
+                    console.log(param);
+                    //dispatch the event delayedSignInOnLoadEvent only whan this service constructed
+                    if(!dispatchDelayedSignIn) {
+                        this.delayedSignInOnLoadEvent.next();
+                        dispatchDelayedSignIn = true;
+                    }
+                        const tok = this.getUserAuthData().id_token;
+                        return this.signInToServer(tok);
+                    
                 });
+                */
                 _this.isAuth2Init = true;
                 _this.auth2InitEvent.next();
             });
@@ -610,40 +616,53 @@ var GoogleAuthService = /** @class */ (function () {
     //#region :: public AuthService API mathods
     GoogleAuthService.prototype.onSignIn = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var res, tok, serverRes;
+            var res, tok;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!(this.isAuth2Init && !this.auth2.isSignedIn.get())) return [3 /*break*/, 3];
+                        if (!this.isAuth2Init) return [3 /*break*/, 3];
                         return [4 /*yield*/, this.auth2.signIn()];
                     case 1:
                         res = _a.sent();
                         console.log('User signed in.');
                         tok = res.Zi.id_token;
-                        return [4 /*yield*/, this.userApi.postSignInUser(__WEBPACK_IMPORTED_MODULE_5__models_provider_enum__["a" /* Provider */].GOOGLE_PROVIDER, { idToken: tok })];
-                    case 2:
+                        return [4 /*yield*/, this.signInToServer(tok)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                    case 3: throw new Error('the auth2 object is\'nt initialized');
+                }
+            });
+        });
+    };
+    GoogleAuthService.prototype.signInToServer = function (token) {
+        return __awaiter(this, void 0, void 0, function () {
+            var serverRes;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.userApi.postSignInUser(__WEBPACK_IMPORTED_MODULE_5__models_provider_enum__["a" /* Provider */].GOOGLE_PROVIDER, { idToken: token })];
+                    case 1:
                         serverRes = _a.sent();
                         // authenticate the server response. / validating the returned user id.
                         this.authenticateServerResponse(serverRes.body);
                         // saving the signed user data in the service.
                         this.udb = serverRes.body.data.user;
-                        return [2 /*return*/, this.udb];
-                    case 3: throw new Error('the user is sign in or the auth2 object is\'nt initialized');
+                        return [2 /*return*/, serverRes.body.data];
                 }
             });
         });
     };
     GoogleAuthService.prototype.onSignOut = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var headers;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!(this.isAuth2Init && this.auth2.isSignedIn.get())) return [3 /*break*/, 3];
+                        headers = this.getAuthHeader();
                         return [4 /*yield*/, this.auth2.signOut()];
                     case 1:
                         _a.sent(); // this method do have no return value
                         console.log('User signed out.');
-                        return [4 /*yield*/, this.userApi.deleteUserCurToken(this.getAuthHeader())];
+                        return [4 /*yield*/, this.userApi.deleteUserCurToken(headers)];
                     case 2:
                         _a.sent();
                         return [3 /*break*/, 4];
@@ -659,7 +678,7 @@ var GoogleAuthService = /** @class */ (function () {
      */
     GoogleAuthService.prototype.isSignIn = function () {
         if (this.isAuth2Init) {
-            return this.auth2.isSignedIn.get();
+            return (this.auth2.isSignedIn.get() && this.udb != undefined);
         }
         else {
             return false;
@@ -813,7 +832,7 @@ var FacebookAuthService = /** @class */ (function () {
                     case 2:
                         serverRes = _a.sent();
                         this.udb = serverRes.body.data.user;
-                        return [2 /*return*/, this.udb];
+                        return [2 /*return*/, serverRes.body.data];
                     case 3:
                         console.log('The person is not logged into this app or we are unable to tell.');
                         _a.label = 4;
@@ -932,8 +951,8 @@ var FacebookAuthService = /** @class */ (function () {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TabsPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__auth_auth__ = __webpack_require__(104);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__profile_profile__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__auth_auth__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__profile_profile__ = __webpack_require__(104);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1004,8 +1023,8 @@ var Provider;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__ = __webpack_require__(326);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_splash_screen__ = __webpack_require__(329);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__app_component__ = __webpack_require__(409);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pages_auth_auth__ = __webpack_require__(104);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pages_profile_profile__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pages_auth_auth__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pages_profile_profile__ = __webpack_require__(104);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pages_tabs_tabs__ = __webpack_require__(330);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_user_api_user_api_service__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__services_google_auth_google_auth_service__ = __webpack_require__(285);
@@ -1049,8 +1068,8 @@ var AppModule = /** @class */ (function () {
                 __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["b" /* HttpClientModule */],
                 __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["c" /* IonicModule */].forRoot(__WEBPACK_IMPORTED_MODULE_6__app_component__["a" /* MyApp */], {}, {
                     links: [
-                        { loadChildren: '../pages/auth/auth.module#AuthPageModule', name: 'AuthPage', segment: 'auth', priority: 'low', defaultHistory: [] },
-                        { loadChildren: '../pages/profile/profile.module#ProfilePageModule', name: 'ProfilePage', segment: 'profile', priority: 'low', defaultHistory: [] }
+                        { loadChildren: '../pages/profile/profile.module#ProfilePageModule', name: 'ProfilePage', segment: 'profile', priority: 'low', defaultHistory: [] },
+                        { loadChildren: '../pages/auth/auth.module#AuthPageModule', name: 'AuthPage', segment: 'auth', priority: 'low', defaultHistory: [] }
                     ]
                 })
             ],
@@ -1522,7 +1541,7 @@ var UserApiService = /** @class */ (function () {
                     case 2:
                         res = _a.sent();
                         console.log(res);
-                        return [2 /*return*/, res];
+                        return [2 /*return*/, res.body.data];
                     case 3:
                         e_3 = _a.sent();
                         throw e_3;
@@ -1668,10 +1687,12 @@ var AgentAuthService = /** @class */ (function () {
             f_init = true;
             _this.chackIsAuthResInit(g_init, f_init, true);
         });
-        this.google.delayedSignInOnLoadEventSubscribe(function () {
-            _this.userStatusChangeEvent.next();
-            _this.setStrategy(__WEBPACK_IMPORTED_MODULE_6__models_provider_enum__["a" /* Provider */].GOOGLE_PROVIDER);
+        /*
+        this.google.delayedSignInOnLoadEventSubscribe(() => {
+            this.userStatusChangeEvent.next();
+            this.setStrategy(Provider.GOOGLE_PROVIDER);
         });
+        */
     }
     //#region - user actions / talk with server
     AgentAuthService.prototype.onSignIn = function (params) {
