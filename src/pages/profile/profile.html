@@ -12,11 +12,6 @@
   <ion-grid *ngIf="isSignIn(); else notSignIn">
     <ion-row>
       <ion-col>
-        <ion-title>Hello {{getProfile().userName?}} !</ion-title>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
         <ion-list>
           <ion-item>
             First name : {{getProfile().personalData?.firstName}}
@@ -28,7 +23,7 @@
             Email : {{getProfile().email}}
           </ion-item>
           <ion-item>
-            ID : {{getProfile().id}}
+            ID : {{getProfile()._id}}
           </ion-item>
         </ion-list>
       </ion-col>
