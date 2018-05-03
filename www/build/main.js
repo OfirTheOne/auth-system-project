@@ -45,7 +45,7 @@ var ProfilePage = /** @class */ (function () {
     };
     ProfilePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-profile',template:/*ion-inline-start:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/'<ion-header>\n\n  <ion-navbar>\n    <ion-title>Profile</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n  <ion-grid *ngIf="isSignIn(); else notSignIn">\n    <ion-row>\n      <ion-col>\n        <ion-title>Hello {{getProfile().userName}} !</ion-title>\n      </ion-col>\n    </ion-row>\n    <ion-row>\n      <ion-col>\n        <ion-list>\n          <ion-item>\n            First name : {{getProfile().personalData?.firstName}}\n          </ion-item>\n          <ion-item>\n            Last name : {{getProfile().personalData?.lastName}}\n          </ion-item>\n          <ion-item>\n            Email : {{getProfile().email}}\n          </ion-item>\n          <ion-item>\n            ID : {{getProfile().id}}\n          </ion-item>\n        </ion-list>\n      </ion-col>\n    </ion-row>\n  </ion-grid>\n\n  <ng-template #notSignIn>\n      <ion-grid>\n        <ion-row>\n          <ion-col>\n            <ion-title>No user sign in</ion-title>\n          </ion-col>\n        </ion-row>\n      </ion-grid>\n    </ng-template>\n\n</ion-content>'/*ion-inline-end:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/,
+            selector: 'page-profile',template:/*ion-inline-start:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/'<ion-header>\n\n  <ion-navbar>\n    <ion-title>Profile</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n  <ion-grid *ngIf="isSignIn(); else notSignIn">\n    <ion-row>\n      <ion-col>\n        <ion-list>\n          <ion-item>\n            First name : {{getProfile().personalData?.firstName}}\n          </ion-item>\n          <ion-item>\n            Last name : {{getProfile().personalData?.lastName}}\n          </ion-item>\n          <ion-item>\n            Email : {{getProfile().email}}\n          </ion-item>\n          <ion-item>\n            ID : {{getProfile()._id}}\n          </ion-item>\n        </ion-list>\n      </ion-col>\n    </ion-row>\n  </ion-grid>\n\n  <ng-template #notSignIn>\n      <ion-grid>\n        <ion-row>\n          <ion-col>\n            <ion-title>No user sign in</ion-title>\n          </ion-col>\n        </ion-row>\n      </ion-grid>\n    </ng-template>\n\n</ion-content>'/*ion-inline-end:"C:\Users\Ofir Genish\ionic projects\auth-system-project\src\pages\profile\profile.html"*/,
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2__services_agent_auth_service__["a" /* AgentAuthService */]])
     ], ProfilePage);
@@ -272,11 +272,11 @@ webpackEmptyAsyncContext.id = 117;
 
 var map = {
 	"../pages/auth/auth.module": [
-		411,
+		412,
 		1
 	],
 	"../pages/profile/profile.module": [
-		410,
+		411,
 		0
 	]
 };
@@ -1031,6 +1031,7 @@ var Provider;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__services_facebook_auth_facebook_auth_service__ = __webpack_require__(286);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_custom_auth_custom_auth_service__ = __webpack_require__(160);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__services_agent_auth_service__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__app_env__ = __webpack_require__(410);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1052,6 +1053,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
+
+console.log(__WEBPACK_IMPORTED_MODULE_15__app_env__["a" /* ENV */]);
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -1396,6 +1399,7 @@ var MyApp = /** @class */ (function () {
     function MyApp(platform, statusBar, splashScreen) {
         this.rootPage = __WEBPACK_IMPORTED_MODULE_4__pages_tabs_tabs__["a" /* TabsPage */];
         platform.ready().then(function () {
+            console.log(window['configVar']);
             // Okay, so the platform is ready and our plugins are available.
             // Here you can do any higher level native things you might need.
             statusBar.styleDefault();
@@ -1411,6 +1415,18 @@ var MyApp = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=app.component.js.map
+
+/***/ }),
+
+/***/ 410:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ENV; });
+var ENV = {
+    mode: 'Development',
+};
+//# sourceMappingURL=environment.dev.js.map
 
 /***/ }),
 
