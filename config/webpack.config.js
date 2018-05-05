@@ -1,13 +1,14 @@
 // Set the `ENV` global variable to be used in the app.
 const path = require('path');
 const webpack = require('webpack');
-console.log(JSON.stringify(process.env, undefined, 2));
-const projectRootDir = process.env.IONIC_ROOT_DIR;
+//console.log(JSON.stringify(process.env, undefined, 2));
+
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '../node_modules/@ionic/app-scripts';
 
-console.log('here', appScriptsDir);
+console.log('here1');
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
-console.log(config);
+console.log('here2');
+//console.log(config);
 var env = process.env.NODE_ENV || 'development';
 
 console.log(env);
@@ -30,10 +31,10 @@ try {
    *  values that hardcoded on the file.
    * */
 
-  envVars = require(path.join(projectRootDir, 'env', envFileFullName));
+  envVars = require(path.join('../env', envFileFullName));
 } catch (e) {
  
-  console.log(e);
+  console.log('here3', e);
   envVars = {};
 }
 
