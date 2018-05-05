@@ -6,7 +6,7 @@ const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
 console.log(JSON.stringify(process.env, undefined, 2));
 
 console.log('here1');
-var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
+var config = require(path.join(process.env.npm_config_prefix, '/lib/node_modules/@ionic/app-scripts', 'config', 'webpack.config.js'));
 console.log('here2');
 //console.log(config);
 var env = process.env.NODE_ENV || 'development';
