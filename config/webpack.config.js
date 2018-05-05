@@ -6,7 +6,7 @@ const projectRootDir = process.env.IONIC_ROOT_DIR;
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR;
 
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
-
+console.log(config);
 var env = process.env.NODE_ENV || 'development';
 
 console.log(env);
@@ -31,6 +31,7 @@ try {
 
   envVars = require(path.join(projectRootDir, 'env', envFileFullName));
 } catch (e) {
+ 
   console.log(e);
   envVars = {};
 }
