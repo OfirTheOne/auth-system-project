@@ -1,9 +1,9 @@
 // Set the `ENV` global variable to be used in the app.
 const path = require('path');
 const webpack = require('webpack');
-//console.log(JSON.stringify(process.env, undefined, 2));
 
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
+console.log(JSON.stringify(process.env, undefined, 2));
 
 console.log('here1');
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
