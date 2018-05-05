@@ -3,7 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 console.log(JSON.stringify(process.env, undefined, 2));
 const projectRootDir = process.env.IONIC_ROOT_DIR;
-const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR;
+const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '../node_modules/@ionic/app-scripts';
 
 console.log('here', appScriptsDir);
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
