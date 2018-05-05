@@ -32,7 +32,7 @@ plugins/ios.json
 # www/
 $RECYCLE.BIN/
 
-src/env/dev.json
+env/dev.json
 
 .DS_Store
 Thumbs.db
