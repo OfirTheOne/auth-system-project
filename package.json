@@ -5,7 +5,8 @@
   "homepage": "http://ionicframework.com/",
   "private": true,
   "scripts": {
-    "heroku-postbuild": "webpack --config ./config/webpack.config.js",
+    "postinstall": "webpack --config ./config/webpack.config.js --progress", 
+    "start": "node server.js",
     "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
     "lint": "ionic-app-scripts lint",
