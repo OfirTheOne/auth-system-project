@@ -272,11 +272,11 @@ webpackEmptyAsyncContext.id = 117;
 
 var map = {
 	"../pages/auth/auth.module": [
-		412,
+		411,
 		1
 	],
 	"../pages/profile/profile.module": [
-		411,
+		410,
 		0
 	]
 };
@@ -1031,7 +1031,6 @@ var Provider;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__services_facebook_auth_facebook_auth_service__ = __webpack_require__(286);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_custom_auth_custom_auth_service__ = __webpack_require__(160);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__services_agent_auth_service__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__app_env__ = __webpack_require__(410);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1053,8 +1052,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-
-console.log(__WEBPACK_IMPORTED_MODULE_15__app_env__["a" /* ENV */]);
+//declare var ENV: any;
+//console.log(ENV);
+// import { ENV } from '@app/env';
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -1398,8 +1398,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var MyApp = /** @class */ (function () {
     function MyApp(platform, statusBar, splashScreen) {
         this.rootPage = __WEBPACK_IMPORTED_MODULE_4__pages_tabs_tabs__["a" /* TabsPage */];
+        console.log({"API_URL":"https://frozen-depths-97143.herokuapp.com/","FB_APP_ID":"121800088679838","GGL_CLIENT_ID":"185191598431-iloo5lp0ne8jshgj5cblusuglr4bv2rt.apps.googleusercontent.com","GGL_API_KEY":"AIzaSyAacSp1HggwNuJQvmW7WE374Gzs3-ETDjU","environment":"development"});
         platform.ready().then(function () {
-            console.log(window['configVar']);
             // Okay, so the platform is ready and our plugins are available.
             // Here you can do any higher level native things you might need.
             statusBar.styleDefault();
@@ -1415,18 +1415,6 @@ var MyApp = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=app.component.js.map
-
-/***/ }),
-
-/***/ 410:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ENV; });
-var ENV = {
-    mode: 'Development',
-};
-//# sourceMappingURL=environment.dev.js.map
 
 /***/ }),
 

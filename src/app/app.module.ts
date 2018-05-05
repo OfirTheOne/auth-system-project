@@ -18,8 +18,11 @@ import { FacebookAuthService } from '../services/facebook-auth/facebook-auth.ser
 import { CustomAuthService } from '../services/custom-auth/custom-auth.service';
 import { AgentAuthService } from '../services/agent-auth.service';
 
-import { ENV } from '@app/env';
-console.log(ENV);
+//declare var ENV: any;
+//console.log(ENV);
+// import { ENV } from '@app/env';
+
+
 
 @NgModule({
   declarations: [

@@ -4,19 +4,10 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 
-import { ENV } from '@app/env';
-
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ 'extended': 'true' }));
 app.use(bodyParser.json());
 app.use(cors());
-
-configObj = process.env;
-ENV['API_URL'] = configObj.API_URL;
-ENV['FB_APP_ID'] = configObj.FB_APP_ID;
-ENV['GGL_CLIENT_ID'] = configObj.GGL_CLIENT_ID;
-ENV['GGL_API_KEY'] = configObj.GGL_API_KEY;
-
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
