@@ -45,8 +45,7 @@ let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({
-      ENV: JSON.stringify(envVars) ,
-      'process.env.ENV' : JSON.stringify(envVars)
+      ENV: JSON.stringify(envVars)
   })
 );
 
