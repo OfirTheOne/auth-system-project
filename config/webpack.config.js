@@ -39,9 +39,9 @@ try {
 }
 
 envVars.environment = env;
-
+console.log('(env == production) : ', (env == 'production'));
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
-
+console.log('configKeyEnvName : ', configKeyEnvName);
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({
     ENV: JSON.stringify(envVars)
@@ -49,10 +49,10 @@ config[configKeyEnvName].plugins.push(
 );
 
 console.log(JSON.stringify(config[configKeyEnvName].plugins, undefined, 2));
-/*
+
 if (env === 'production') {
   // This helps ensure the builds are consistent if source hasn't changed:
   config[configKeyEnvName].plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
 }
-*/
+
 module.exports = config;
