@@ -38,13 +38,18 @@ try {
   envVars = {};
 }
 
+let processEnv = process.env
+console.log(JSON.stringify(processEnv, undefined, 2));
+
 envVars.environment = env;
 console.log('(env == production) : ', (env == 'production'));
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 console.log('configKeyEnvName : ', configKeyEnvName);
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({
-    ENV: JSON.stringify(envVars)
+    processEnv : Object.assign(processEnv, {
+      ENV: JSON.stringify(envVars) 
+    }) 
   })
 );
 
