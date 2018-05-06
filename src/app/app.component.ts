@@ -5,7 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { TabsPage } from '../pages/tabs/tabs';
 
 //declare const ;
-declare var ENV: Object;
+//declare var ENV: Object;
 
 @Component({
   templateUrl: 'app.html'
@@ -14,7 +14,7 @@ export class MyApp {
   rootPage:any = TabsPage;
 
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
-    console.log(ENV)
+    //console.log(ENV)
     platform.ready().then(() => {
       
       // Okay, so the platform is ready and our plugins are available.
