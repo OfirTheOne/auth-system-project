@@ -4,8 +4,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { TabsPage } from '../pages/tabs/tabs';
 
-import {MYENV} from '../../env/env';
-// var process : ProcessEnv;
+//import {MYENV} from '../../env/env';
+declare var MYENV: any;
 
 // console.log(process['env']);
 @Component({

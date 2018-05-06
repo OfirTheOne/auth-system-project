@@ -1,2 +1,2 @@
-declare var MYENV: any;
-export { MYENV };
+// declare var MYENV: any;
+// export { MYENV };
