@@ -272,11 +272,11 @@ webpackEmptyAsyncContext.id = 117;
 
 var map = {
 	"../pages/auth/auth.module": [
-		411,
+		412,
 		1
 	],
 	"../pages/profile/profile.module": [
-		410,
+		411,
 		0
 	]
 };
@@ -1381,6 +1381,7 @@ webpackContext.id = 383;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__ = __webpack_require__(326);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(329);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pages_tabs_tabs__ = __webpack_require__(330);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__env_env__ = __webpack_require__(410);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1395,11 +1396,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var MyApp = /** @class */ (function () {
     function MyApp(platform, statusBar, splashScreen) {
         this.rootPage = __WEBPACK_IMPORTED_MODULE_4__pages_tabs_tabs__["a" /* TabsPage */];
-        console.log({"API_URL":"https://frozen-depths-97143.herokuapp.com/","FB_APP_ID":"121800088679838","GGL_CLIENT_ID":"185191598431-iloo5lp0ne8jshgj5cblusuglr4bv2rt.apps.googleusercontent.com","GGL_API_KEY":"AIzaSyAacSp1HggwNuJQvmW7WE374Gzs3-ETDjU","environment":"development"});
+        console.log(__WEBPACK_IMPORTED_MODULE_5__env_env__["a" /* ENV */]);
         platform.ready().then(function () {
+            console.log(__WEBPACK_IMPORTED_MODULE_5__env_env__["a" /* ENV */]);
             // Okay, so the platform is ready and our plugins are available.
             // Here you can do any higher level native things you might need.
             statusBar.styleDefault();
@@ -1415,6 +1418,17 @@ var MyApp = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=app.component.js.map
+
+/***/ }),
+
+/***/ 410:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return env; });
+var env = {"API_URL":"https://frozen-depths-97143.herokuapp.com/","FB_APP_ID":"121800088679838","GGL_CLIENT_ID":"185191598431-iloo5lp0ne8jshgj5cblusuglr4bv2rt.apps.googleusercontent.com","GGL_API_KEY":"AIzaSyAacSp1HggwNuJQvmW7WE374Gzs3-ETDjU","environment":"development"};
+
+//# sourceMappingURL=env.js.map
 
 /***/ }),
 

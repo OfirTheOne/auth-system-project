@@ -4,8 +4,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { TabsPage } from '../pages/tabs/tabs';
 
-//declare const ;
-declare var ENV: Object;
+import {ENV} from '../../env/env';
 
 @Component({
   templateUrl: 'app.html'
@@ -14,7 +13,8 @@ export class MyApp {
   rootPage:any = TabsPage;
 
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
-    // console.log(ENV);
+    
+    console.log(ENV);
     platform.ready().then(() => {
       console.log(ENV);
       // Okay, so the platform is ready and our plugins are available.
