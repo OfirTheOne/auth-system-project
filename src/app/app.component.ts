@@ -4,7 +4,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { TabsPage } from '../pages/tabs/tabs';
 
-import {ENV} from '../../env/env';
+import {MYENV} from '../../env/env';
 // var process : ProcessEnv;
 
 // console.log(process['env']);
@@ -17,7 +17,7 @@ export class MyApp {
     
     //console.log(ENV);
     platform.ready().then(() => {
-      console.log(ENV);
+      console.log(MYENV);
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
