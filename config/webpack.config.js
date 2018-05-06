@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
 console.log(JSON.stringify(process.env, undefined, 2));
-
+console.log(process.env.IONIC_ENV);
 console.log('here1', appScriptsDir);
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 console.log('here2');
@@ -49,10 +49,10 @@ config[configKeyEnvName].plugins.push(
 );
 
 console.log(JSON.stringify(config[configKeyEnvName].plugins, undefined, 2));
-
+/*
 if (env === 'production') {
   // This helps ensure the builds are consistent if source hasn't changed:
   config[configKeyEnvName].plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
 }
-
+*/
 module.exports = config;
