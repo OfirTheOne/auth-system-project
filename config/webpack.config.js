@@ -3,15 +3,15 @@ const path = require('path');
 const webpack = require('webpack');
 
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
-console.log(JSON.stringify(process.env, undefined, 2));
-console.log(process.env.IONIC_ENV);
-console.log('here1', appScriptsDir);
+//console.log(JSON.stringify(process.env, undefined, 2));
+//console.log(process.env.IONIC_ENV);
+//console.log('here1', appScriptsDir);
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
-console.log('here2');
+//console.log('here2');
 //console.log(config);
 var env = process.env.NODE_ENV || 'development';
 
-console.log(env);
+//console.log(env);
 
 var envVars;
 try {
@@ -34,22 +34,19 @@ try {
   envVars = require(path.join('../env', envFileFullName));
 } catch (e) {
  
-  console.log('here3', e);
+  console.log(e);
   envVars = {};
 }
 
-let processEnv = process.env
-console.log(JSON.stringify(processEnv, undefined, 2));
-
 envVars.environment = env;
-console.log('(env == production) : ', (env == 'production'));
+// console.log('(env == production) : ', (env == 'production'));
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
-console.log('configKeyEnvName : ', configKeyEnvName);
+// console.log('configKeyEnvName : ', configKeyEnvName);
+
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({
-    processEnv : Object.assign(processEnv, {
-      ENV: JSON.stringify(envVars) 
-    }) 
+      ENV: JSON.stringify(envVars) ,
+      'process.env.ENV' : JSON.stringify(envVars)
   })
 );
 

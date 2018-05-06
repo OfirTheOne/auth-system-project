@@ -1,4 +1,4 @@
-declare var ENV: Object;
+declare var ENV: any;
 
-const env: Object = ENV;
+const env: any = ENV;
 export { env as ENV };
