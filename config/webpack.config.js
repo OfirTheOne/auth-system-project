@@ -38,11 +38,16 @@ envVars.environment = env;
 
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 
-process.env = Object.assign(process.env, envVars);
+//process.env = Object.assign(process.env, envVars);
 console.log(JSON.stringify(process.env, undefined, 2));
 
 config[configKeyEnvName].plugins.push(
-  new webpack.EnvironmentPlugin(Object.keys(envVars))
+  new webpack.DefinePlugin({
+    API_URL : JSON.stringify(envVars.API_URL),
+    FB_APP_ID : JSON.stringify(envVars.FB_APP_ID),
+    GGL_CLIENT_ID : JSON.stringify(envVars.GGL_CLIENT_ID),
+    GGL_API_KEY : JSON.stringify(envVars.GGL_API_KEY)
+  })
 );
 
 console.log(JSON.stringify(config[configKeyEnvName].plugins, undefined, 2));
