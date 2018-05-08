@@ -9,9 +9,9 @@ const envMonitor = () => {
   const _env = process.env.NODE_ENV || 'development';
   var curEnv = {};
   if(_env == 'production') {
-      curEnv = require(path.join(rootDir, 'env/prod.js'));
+      curEnv = require(path.join(rootDir, 'src/env', 'prod.js'));
   } else {
-      curEnv = require(path.join(rootDir, 'env/dev.json'));
+      curEnv = require(path.join(rootDir, 'src/env', 'dev.json'));
   }
   curEnv.environment = _env;
   return curEnv;
@@ -22,7 +22,7 @@ var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
 
 // console.log(require(path.join(rootDir,'env/env-monitor.js')));
-console.log(envMonitor());
+//console.log(envMonitor());
 var env = process.env.NODE_ENV || 'development';
 var envVarDirPath;
 var envVars;
@@ -43,7 +43,7 @@ try {
    *  values that hardcoded on the file.
    * */
 
-  envVarDirPath = path.join(rootDir, 'env', envFileFullName);
+  envVarDirPath = path.join(rootDir, 'src/env', envFileFullName);
   envVars = require(envVarDirPath);
   
 } catch (e) {
@@ -58,7 +58,7 @@ console.log(JSON.stringify(envVars, undefined, 2));
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 console.log(envVarDirPath);
 config[configKeyEnvName].resolve.alias = {
-  "@app/myenv": envVarDirPath
+  "@app/env": envVarDirPath
 };
 //config[configKeyEnvName].resolve.extensions = ['.js', '.json'];
 //process.env = Object.assign(process.env, envVars);

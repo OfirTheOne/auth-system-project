@@ -12,9 +12,9 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "target": "es5",
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@app/myenv": [
+      "@app/env": [
         "env/prod" 
       ]
     }
