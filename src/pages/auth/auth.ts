@@ -2,7 +2,7 @@ import { AgentAuthService } from './../../services/agent-auth.service';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Loading } from 'ionic-angular';
 import { Provider } from '../../models/provider.enum';
-declare const MY_ENV;
+
 
 @IonicPage()
 @Component({
@@ -25,7 +25,6 @@ export class AuthPage {
   }
 
   ionViewDidLoad() {
-    console.log(MY_ENV);
     console.log('ionViewDidLoad AuthPage');
   }
 
