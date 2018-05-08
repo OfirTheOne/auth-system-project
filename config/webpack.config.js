@@ -58,7 +58,7 @@ console.log(JSON.stringify(envVars, undefined, 2));
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 console.log(envVarDirPath);
 config[configKeyEnvName].resolve.alias = {
-  "@myenv": envVarDirPath
+  "@app/myenv": envVarDirPath
 };
 //config[configKeyEnvName].resolve.extensions = ['.js', '.json'];
 //process.env = Object.assign(process.env, envVars);
