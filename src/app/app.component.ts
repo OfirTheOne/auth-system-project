@@ -21,7 +21,11 @@ declare var process: {
 export class MyApp {
   rootPage:any = TabsPage;
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
-    console.log(JSON.stringify(process.env, undefined, 2));
+    console.log(JSON.stringify(process.env.API_URL, undefined, 2));
+    console.log(JSON.stringify(process.env.GGL_API_KEY, undefined, 2));
+    console.log(JSON.stringify(process.env.GGL_CLIENT_ID, undefined, 2));
+    console.log(JSON.stringify(process.env.FB_APP_ID, undefined, 2));
+  
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
