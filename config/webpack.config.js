@@ -7,7 +7,7 @@ const rootDir = process.env.IONIC_ROOT_DIR;
 
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
-console.log(require('../env/env-monitor').default);
+console.log(require(path.join(rootDir,'env/env-monitor')));
 
 var env = process.env.NODE_ENV || 'development';
 let envVarDirPath;
