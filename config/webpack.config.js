@@ -32,7 +32,7 @@ try {
    *  values that hardcoded on the file.
    * */
 
-  envVars = require(path.join((rootDir? rootDir : '../'), 'env', envFileFullName));
+  envVars = require(path.join(rootDir, 'env', envFileFullName));
 } catch (e) {
  
   console.log(e);
@@ -43,10 +43,10 @@ envVars.environment = env;
 
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 // console.log('configKeyEnvName : ', configKeyEnvName);
-
+// JSON.stringify(envVars)
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({
-    MY_ENV: JSON.stringify(envVars)
+    MY_ENV: JSON.stringify('hello')
   })
 );
 
