@@ -3,6 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
+const rootDir = process.env.IONIC_ROOT_DIR;
 //console.log(JSON.stringify(process.env, undefined, 2));
 //console.log(process.env.IONIC_ENV);
 //console.log('here1', appScriptsDir);
@@ -12,7 +13,7 @@ var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 var env = process.env.NODE_ENV || 'development';
 
 //console.log(env);
-
+process.env.IO
 var envVars;
 try {
   let envFileFullName;
@@ -31,7 +32,7 @@ try {
    *  values that hardcoded on the file.
    * */
 
-  envVars = require(path.join('../env', envFileFullName));
+  envVars = require(path.join((rootDir? rootDir : '../'), 'env', envFileFullName));
 } catch (e) {
  
   console.log(e);
@@ -39,13 +40,13 @@ try {
 }
 
 envVars.environment = env;
-// console.log('(env == production) : ', (env == 'production'));
+
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 // console.log('configKeyEnvName : ', configKeyEnvName);
 
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({
-    MYENV: JSON.stringify(envVars)
+    MY_ENV: JSON.stringify(envVars)
   })
 );
 

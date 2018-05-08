@@ -20,9 +20,7 @@ import { FacebookAuthService } from '../services/facebook-auth/facebook-auth.ser
 import { CustomAuthService } from '../services/custom-auth/custom-auth.service';
 import { AgentAuthService } from '../services/agent-auth.service';
 
-//declare var ENV: any;
-//console.log(ENV);
-// import { ENV } from '@app/env';
+
 
 
 
