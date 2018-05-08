@@ -5,10 +5,26 @@ const webpack = require('webpack');
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
 const rootDir = process.env.IONIC_ROOT_DIR;
 
+const envMonitor = () => {
+  const _env = process.env.NODE_ENV || 'development';
+  var curEnv = {};
+  if(_env == 'production') {
+      curEnv = require(path.join(rootDir, 'env/prod.js'));
+  } else {
+      curEnv = require(path.join(rootDir, 'env/dev.json'));
+  }
+  curEnv.environment = _env;
+  return curEnv;
+}
+
+
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
-console.log(require(path.join(rootDir,'env/env-monitor.js')));
 
+
+
+// console.log(require(path.join(rootDir,'env/env-monitor.js')));
+console.log(envMonitor());
 var env = process.env.NODE_ENV || 'development';
 let envVarDirPath;
 var envVars;
@@ -64,5 +80,7 @@ if (env === 'production') {
   // This helps ensure the builds are consistent if source hasn't changed:
   config[configKeyEnvName].plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
 }
+
+
 
 module.exports = config;
