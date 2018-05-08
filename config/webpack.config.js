@@ -8,7 +8,7 @@ const rootDir = process.env.IONIC_ROOT_DIR;
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
 var env = process.env.NODE_ENV || 'development';
-
+let envVarDirPath;
 var envVars;
 try {
   let envFileFullName;
@@ -27,7 +27,9 @@ try {
    *  values that hardcoded on the file.
    * */
 
-  envVars = require(path.join(rootDir, 'env', envFileFullName));
+  envVarDirPath = path.join(rootDir, 'env', envFileFullName);
+  envVars = require(envVarDirPath);
+  
 } catch (e) {
  
   console.log(e);
@@ -37,6 +39,10 @@ try {
 envVars.environment = env;
 
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
+
+config[configKeyEnvName].resolve.alias = {
+  "@app/myenv": envVarDirPath
+};
 
 //process.env = Object.assign(process.env, envVars);
 console.log(JSON.stringify(process.env, undefined, 2));
