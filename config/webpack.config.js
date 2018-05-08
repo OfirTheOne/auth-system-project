@@ -21,15 +21,13 @@ const envMonitor = () => {
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
 
-
-
 // console.log(require(path.join(rootDir,'env/env-monitor.js')));
 console.log(envMonitor());
 var env = process.env.NODE_ENV || 'development';
-let envVarDirPath;
+var envVarDirPath;
 var envVars;
 try {
-  let envFileFullName;
+  var envFileFullName;
   if (env == 'development') {
     envFileFullName = 'dev.json';
   } else {
@@ -55,13 +53,14 @@ try {
 }
 
 envVars.environment = env;
+console.log(JSON.stringify(envVars, undefined, 2));
 
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
-
+console.log(envVarDirPath);
 config[configKeyEnvName].resolve.alias = {
   "@myenv": envVarDirPath
 };
-
+//config[configKeyEnvName].resolve.extensions = ['.js', '.json'];
 //process.env = Object.assign(process.env, envVars);
 console.log(JSON.stringify(process.env, undefined, 2));
 /*
@@ -74,13 +73,15 @@ config[configKeyEnvName].plugins.push(
   })
 );
 */
-console.log(JSON.stringify(config[configKeyEnvName].plugins, undefined, 2));
-
+console.log(JSON.stringify(config[configKeyEnvName].resolve, undefined, 2));
+/*
 if (env === 'production') {
   // This helps ensure the builds are consistent if source hasn't changed:
   config[configKeyEnvName].plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
 }
+*/
 
 
-
-module.exports = config;
+module.exports = function () {
+  return config;
+}
