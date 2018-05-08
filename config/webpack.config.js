@@ -7,6 +7,8 @@ const rootDir = process.env.IONIC_ROOT_DIR;
 
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
+console.log(require('../env/env-monitor').default);
+
 var env = process.env.NODE_ENV || 'development';
 let envVarDirPath;
 var envVars;
@@ -41,12 +43,12 @@ envVars.environment = env;
 let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 
 config[configKeyEnvName].resolve.alias = {
-  "@app/myenv": envVarDirPath
+  "@myenv": envVarDirPath
 };
 
 //process.env = Object.assign(process.env, envVars);
 console.log(JSON.stringify(process.env, undefined, 2));
-
+/*
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({
     API_URL : JSON.stringify(envVars.API_URL),
@@ -55,7 +57,7 @@ config[configKeyEnvName].plugins.push(
     GGL_API_KEY : JSON.stringify(envVars.GGL_API_KEY)
   })
 );
-
+*/
 console.log(JSON.stringify(config[configKeyEnvName].plugins, undefined, 2));
 
 if (env === 'production') {
