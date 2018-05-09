@@ -84,15 +84,20 @@ config[ionicEnv] = {
     new webpack.EnvironmentPlugin({
     'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
     'NODE_ENV': 'development',
-  }),
-  new webpack.DefinePlugin({
     'process.env.API_URL' : JSON.stringify(envVars.API_URL),
     'process.env.FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
     'process.env.GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
     'process.env.GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
   })
   ],
-
+/* 
+new webpack.EnvironmentPlugin({
+  'process.env.API_URL' : JSON.stringify(envVars.API_URL),
+  'process.env.FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
+  'process.env.GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
+  'process.env.GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
+})
+*/
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
   node: {
