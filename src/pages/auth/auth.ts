@@ -26,7 +26,8 @@ export class AuthPage {
   }
 
   ionViewDidLoad() {
-    console.log(this.envVariables);
+    console.log(this.envVariables.API_URL);
+    console.log(this.envVariables.API_URL);
 
     console.log('ionViewDidLoad AuthPage');
   }
