@@ -9,7 +9,7 @@ const envMonitor = () => {
   const _env = process.env.NODE_ENV || 'development';
   var curEnv = {};
   if(_env == 'production') {
-      curEnv = require(path.join(rootDir, 'src/env', 'prod.js'));
+      curEnv = require(path.join(rootDir, 'src/env', 'prod.ts'));
   } else {
       curEnv = require(path.join(rootDir, 'src/env', 'dev.json'));
   }
@@ -31,7 +31,7 @@ try {
   if (env == 'development') {
     envFileFullName = 'dev.json';
   } else {
-    envFileFullName = 'prod.js';
+    envFileFullName = 'prod.ts';
   }
 
   /**
@@ -60,7 +60,7 @@ console.log(envVarDirPath);
 config[configKeyEnvName].resolve.alias = {
   "@app/env": envVarDirPath
 };
-//config[configKeyEnvName].resolve.extensions = ['.js', '.json'];
+config[configKeyEnvName].resolve.extensions = ['.ts', '.js', '.json'];
 //process.env = Object.assign(process.env, envVars);
 console.log(JSON.stringify(process.env, undefined, 2));
 /*
