@@ -27,10 +27,10 @@ const gerCurEnv = (nodeEnv) => {
 let envVars = gerCurEnv(nodeEnv);
 console.log(JSON.stringify(envVars, undefined, 2));
 
-process.env.API_URL = JSON.stringify(12345);
-process.env.FB_APP_ID = JSON.stringify(envVars.FB_APP_ID);
-process.env.GGL_CLIENT_ID = JSON.stringify(envVars.GGL_CLIENT_ID);
-process.env.GGL_API_KEY = JSON.stringify(envVars.GGL_API_KEY);
+process.env.API_URL = envVars.API_URL;
+process.env.FB_APP_ID = envVars.FB_APP_ID;
+process.env.GGL_CLIENT_ID = envVars.GGL_CLIENT_ID;
+process.env.GGL_API_KEY =envVars.GGL_API_KEY;
 
 console.log(JSON.stringify(process.env, undefined, 2));
     
@@ -67,14 +67,13 @@ config[ionicEnv] = {
   plugins: [
     ionicWebpackFactory.getIonicEnvironmentPlugin(),
     // Get access to IONIC_ENV, but also get access to NODE_ENV *and* default it to 'development'
-    new webpack.EnvironmentPlugin({
-    'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
-    'NODE_ENV': 'development',
-    'API_URL' : JSON.stringify("3456"),
-    'FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
-    'GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
-    'GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
-  })
+    new webpack.EnvironmentPlugin([
+      'IONIC_ENV',
+      'API_URL',
+      'FB_APP_ID',
+      'GGL_CLIENT_ID',
+      'GGL_API_KEY' 
+    ])
   ],
 
 
