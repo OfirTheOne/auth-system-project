@@ -1,7 +1,8 @@
 import { AgentAuthService } from './../../services/agent-auth.service';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Loading } from 'ionic-angular';
 import { Provider } from '../../models/provider.enum';
+import { EnvVariables } from '../../environments/environment.token';
 
 
 @IonicPage()
@@ -11,7 +12,7 @@ import { Provider } from '../../models/provider.enum';
 })
 export class AuthPage {
 
-  constructor(
+  constructor(@Inject(EnvVariables) public envVariables,
     public navCtrl: NavController, 
     public navParams: NavParams,
     private loadingCtrl: LoadingController, 
@@ -25,6 +26,8 @@ export class AuthPage {
   }
 
   ionViewDidLoad() {
+    console.log(this.envVariables);
+
     console.log('ionViewDidLoad AuthPage');
   }
 

@@ -19,6 +19,7 @@ import { GoogleAuthService } from '../services/google-auth/google-auth.service';
 import { FacebookAuthService } from '../services/facebook-auth/facebook-auth.service';
 import { CustomAuthService } from '../services/custom-auth/custom-auth.service';
 import { AgentAuthService } from '../services/agent-auth.service';
+import { EnvironmentsModule } from '../environments/environment.module';
 
 
 
@@ -35,6 +36,7 @@ import { AgentAuthService } from '../services/agent-auth.service';
     BrowserModule,
     HttpClientModule,
     IonicModule.forRoot(MyApp),
+    EnvironmentsModule,
     AuthPageModule,
     ProfilePageModule
   ],
