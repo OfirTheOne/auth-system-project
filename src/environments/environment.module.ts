@@ -2,9 +2,10 @@ import { NgModule } from '@angular/core';
 import { EnvVariables } from './environment.token';
 import { variables } from './environment.generic';
 
-//declare const process: any; // Typescript compiler will complain without this
+declare const process: any; // Typescript compiler will complain without this
 
 export function environmentFactory() {
+  console.log(JSON.stringify(process.env, undefined, 2));
   return variables;
 }
 

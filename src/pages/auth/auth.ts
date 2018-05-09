@@ -27,8 +27,8 @@ export class AuthPage {
 
   ionViewDidLoad() {
     console.log(this.envVariables.API_URL);
-    console.log(this.envVariables.API_URL);
-
+    console.log(this.envVariables.FB_APP_ID);
+    
     console.log('ionViewDidLoad AuthPage');
   }
 

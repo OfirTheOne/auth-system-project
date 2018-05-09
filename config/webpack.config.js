@@ -27,28 +27,14 @@ const gerCurEnv = (nodeEnv) => {
 let envVars = gerCurEnv(nodeEnv);
 console.log(JSON.stringify(envVars, undefined, 2));
 
-/*
-config[ionicEnv].plugins.push(
-  ionicWebpackFactory.getIonicEnvironmentPlugin(),
-);
+process.env.API_URL = JSON.stringify(12345);
+process.env.FB_APP_ID = JSON.stringify(envVars.FB_APP_ID);
+process.env.GGL_CLIENT_ID = JSON.stringify(envVars.GGL_CLIENT_ID);
+process.env.GGL_API_KEY = JSON.stringify(envVars.GGL_API_KEY);
 
-config[ionicEnv].plugins.push(
-  // Get access to IONIC_ENV, but also get access to NODE_ENV *and* default it to 'development'
-  new webpack.EnvironmentPlugin({
-    'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
-    'API_URL' : JSON.stringify(envVars.API_URL),
-    'FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
-    'GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
-    'GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY),
-    'NODE_ENV': 'development'
-  })
-);
-    */
-
-   process.env.API_URL = JSON.stringify(envVars.API_URL);
-   process.env.FB_APP_ID = JSON.stringify(envVars.FB_APP_ID);
-   process.env.GGL_CLIENT_ID = JSON.stringify(envVars.GGL_CLIENT_ID);
-   process.env.GGL_API_KEY = JSON.stringify(envVars.GGL_API_KEY);
+console.log(JSON.stringify(process.env, undefined, 2));
+    
+   
 
 config[ionicEnv] = {
   entry: process.env.IONIC_APP_ENTRY_POINT,
@@ -84,20 +70,15 @@ config[ionicEnv] = {
     new webpack.EnvironmentPlugin({
     'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
     'NODE_ENV': 'development',
-    'process.env.API_URL' : JSON.stringify(envVars.API_URL),
-    'process.env.FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
-    'process.env.GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
-    'process.env.GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
+    'API_URL' : JSON.stringify("3456"),
+    'FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
+    'GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
+    'GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
   })
   ],
-/* 
-new webpack.EnvironmentPlugin({
-  'process.env.API_URL' : JSON.stringify(envVars.API_URL),
-  'process.env.FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
-  'process.env.GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
-  'process.env.GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
-})
-*/
+
+
+
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
   node: {
@@ -106,5 +87,17 @@ new webpack.EnvironmentPlugin({
     tls: 'empty'
   }
 };
+
+
+// new webpack.EnvironmentPlugin({
+//   'process.env.API_URL' : JSON.stringify(envVars.API_URL),
+//   'process.env.FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
+//   'process.env.GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
+//   'process.env.GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
+// })
+
+console.log(JSON.stringify(config[ionicEnv], undefined, 2));
+
+
 
 module.exports = config;
