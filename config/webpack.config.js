@@ -45,6 +45,11 @@ config[ionicEnv].plugins.push(
 );
     */
 
+   process.env.API_URL = JSON.stringify(envVars.API_URL);
+   process.env.FB_APP_ID = JSON.stringify(envVars.FB_APP_ID);
+   process.env.GGL_CLIENT_ID = JSON.stringify(envVars.GGL_CLIENT_ID);
+   process.env.GGL_API_KEY = JSON.stringify(envVars.GGL_API_KEY);
+
 config[ionicEnv] = {
   entry: process.env.IONIC_APP_ENTRY_POINT,
   output: {
