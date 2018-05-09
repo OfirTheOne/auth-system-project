@@ -1,41 +1,51 @@
-// Set the `ENV` global variable to be used in the app.
-const fs = require('fs');
-const chalk = require("chalk");
+
+
+
 const path = require('path');
 const webpack = require('webpack');
-var ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
+const ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
 const rootDir = process.env.IONIC_ROOT_DIR;
 
+const nodeEnv = process.env.NODE_ENV || 'development';
+const ionicEnv = (nodeEnv == 'production') ? 'prod' : 'dev';
+
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
-
-const chackFileExists = (filePath) => {
-  if (!fs.existsSync(filePath)) {
-    console.log(chalk.red('\n' + filePath + ' does not exist!'));
+const gerCurEnv = (nodeEnv) => {
+  let curEnvPath;
+  if(nodeEnv == 'production') {
+    curEnvPath = path.join(rootDir, 'src/environments', 'environment.prod.js');
+  } else {
+    curEnvPath = path.join(rootDir, 'src/environments', 'environment.dev.js');
   }
+  return require(curEnvPath);
 }
 
 
+let envVars = gerCurEnv(nodeEnv);
+console.log(JSON.stringify(envVars, undefined, 2));
 
-var env = process.env.NODE_ENV || 'development';
-var configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
-
-config[configKeyEnvName].plugins.push(
+/*
+config[ionicEnv].plugins.push(
   ionicWebpackFactory.getIonicEnvironmentPlugin(),
 );
 
-config[configKeyEnvName].plugins.push(
+config[ionicEnv].plugins.push(
   // Get access to IONIC_ENV, but also get access to NODE_ENV *and* default it to 'development'
   new webpack.EnvironmentPlugin({
     'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
+    'API_URL' : JSON.stringify(envVars.API_URL),
+    'FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
+    'GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
+    'GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY),
     'NODE_ENV': 'development'
   })
 );
-    
-/*
-config[configKeyEnvName] = {
+    */
+
+config[ionicEnv] = {
   entry: process.env.IONIC_APP_ENTRY_POINT,
   output: {
     path: '{{BUILD}}',
@@ -67,9 +77,13 @@ config[configKeyEnvName] = {
     ionicWebpackFactory.getIonicEnvironmentPlugin(),
     // Get access to IONIC_ENV, but also get access to NODE_ENV *and* default it to 'development'
     new webpack.EnvironmentPlugin({
-      'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
-      'NODE_ENV': 'development'
-    })
+    'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
+    'NODE_ENV': 'development',
+    'API_URL' : JSON.stringify(envVars.API_URL),
+    'FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
+    'GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
+    'GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
+  })
   ],
 
   // Some libraries import Node modules but don't use them in the browser.
@@ -80,5 +94,5 @@ config[configKeyEnvName] = {
     tls: 'empty'
   }
 };
-*/
+
 module.exports = config;

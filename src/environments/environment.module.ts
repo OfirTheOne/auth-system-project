@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
 import { EnvVariables } from './environment.token';
-import { devVariables } from './environment.dev';
-import { prodVariables } from './environment.prod';
+import { variables } from './environment.generic';
 
-declare const process: any; // Typescript compiler will complain without this
+//declare const process: any; // Typescript compiler will complain without this
 
 export function environmentFactory() {
-  return process.env.IONIC_ENV === 'prod' ? prodVariables : devVariables;
+  return variables;
 }
 
 @NgModule({
