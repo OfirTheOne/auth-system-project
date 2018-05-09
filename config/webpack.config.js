@@ -19,7 +19,7 @@ const envMonitor = () => {
   const _env = process.env.NODE_ENV || 'development';
   var curEnv = {};
   if(_env == 'production') {
-      curEnv = require(path.join(rootDir, 'src/environments', 'environment.prod.ts'));
+      curEnv = require(path.join(rootDir, 'src/environments', 'environment.prod'));
   } else {
       curEnv = require(path.join(rootDir, 'src/environments', 'environment.dev.json'));
   }
@@ -39,7 +39,7 @@ try {
   if (env == 'development') {
     envFileFullName = 'environment.dev.json';
   } else {
-    envFileFullName = 'environment.prod.ts';
+    envFileFullName = 'environment.prod';
   }
   /**
    * on production mode -
@@ -70,7 +70,7 @@ config[configKeyEnvName].resolve.modules= [path.join(rootDir, 'src/environments'
 config[configKeyEnvName].resolve.alias = {
   "environment": envVarDirPath
 };
-console.log(JSON.stringify(process.env, undefined, 2));
+//console.log(JSON.stringify(process.env, undefined, 2));
 /*
 config[configKeyEnvName].plugins.push(
   new webpack.DefinePlugin({

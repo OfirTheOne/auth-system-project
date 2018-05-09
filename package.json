@@ -8,7 +8,7 @@
   "homepage": "http://ionicframework.com/",
   "private": true,
   "scripts": {
-    "postinstall": "ionic-app-scripts build android --prod webpack --progress --display-error-details --config ./config/webpack.config.js", 
+    "postinstall": "ionic-app-scripts build android --prod webpack --progress --display-error-details --config ./config/webpack.config.js",
     "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
     "lint": "ionic-app-scripts lint",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@angular/animations": "5.2.9",
+    "@angular/cli": "^6.0.0",
     "@angular/common": "5.2.9",
     "@angular/compiler": "5.2.9",
     "@angular/compiler-cli": "5.2.9",
