@@ -64,9 +64,10 @@ console.log(JSON.stringify(envVars, undefined, 2));
 console.log(envVarDirPath);
 console.log(JSON.stringify(config[configKeyEnvName].resolve, undefined, 2));
 
-config[configKeyEnvName].resolve.extensions = ['.ts', '.js', '.json'];
+config[configKeyEnvName].resolve.extensions = ['.prod.ts', '.ts', '.js', '.dev.json', '.json'];
+config[configKeyEnvName].resolve.modules.push(path.join(rootDir, 'src/environments'));
 config[configKeyEnvName].resolve.alias = {
-  "@app/env": envVarDirPath
+  "@env": envVarDirPath
 };
 console.log(JSON.stringify(process.env, undefined, 2));
 /*

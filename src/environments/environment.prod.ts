@@ -1,6 +1,4 @@
-
 declare const process: any;
-
 
 export var MYENV = {
     API_URL: process.env.API_URL,
