@@ -4,6 +4,7 @@ const webpack = require('webpack');
 
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
 const rootDir = process.env.IONIC_ROOT_DIR;
+var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
 const envMonitor = () => {
   const _env = process.env.NODE_ENV || 'development';
@@ -18,14 +19,12 @@ const envMonitor = () => {
 }
 
 
-var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
-
-
-// console.log(require(path.join(rootDir,'env/env-monitor.js')));
-//console.log(envMonitor());
 var env = process.env.NODE_ENV || 'development';
+var configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
+
 var envVarDirPath;
 var envVars;
+
 try {
   var envFileFullName;
   if (env == 'development') {
@@ -33,7 +32,6 @@ try {
   } else {
     envFileFullName = 'prod.ts';
   }
-
   /**
    * on production mode -
    *  require from prod.js file his export object that conains the config
@@ -45,9 +43,7 @@ try {
 
   envVarDirPath = path.join(rootDir, 'src/env', envFileFullName);
   envVars = require(envVarDirPath);
-  
-} catch (e) {
- 
+} catch (e) { 
   console.log(e);
   envVars = {};
 }
@@ -55,13 +51,13 @@ try {
 envVars.environment = env;
 console.log(JSON.stringify(envVars, undefined, 2));
 
-let configKeyEnvName = (env == 'production') ? 'prod' : 'dev';
 console.log(envVarDirPath);
+console.log(JSON.stringify(config[configKeyEnvName].resolve, undefined, 2));
+
+config[configKeyEnvName].resolve.extensions = ['.ts', '.js', '.json'];
 config[configKeyEnvName].resolve.alias = {
   "@app/env": envVarDirPath
 };
-config[configKeyEnvName].resolve.extensions = ['.ts', '.js', '.json'];
-//process.env = Object.assign(process.env, envVars);
 console.log(JSON.stringify(process.env, undefined, 2));
 /*
 config[configKeyEnvName].plugins.push(
