@@ -1,18 +1,27 @@
 // Set the `ENV` global variable to be used in the app.
 const path = require('path');
 const webpack = require('webpack');
+const fs = require('fs');
+const chalk = require("chalk");
 
 const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
 const rootDir = process.env.IONIC_ROOT_DIR;
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 
+
+const chackFileExists = (filePath) => {
+  if (!fs.existsSync(filePath)) {
+    console.log(chalk.red('\n' + filePath + ' does not exist!'));
+  }
+}
+
 const envMonitor = () => {
   const _env = process.env.NODE_ENV || 'development';
   var curEnv = {};
   if(_env == 'production') {
-      curEnv = require(path.join(rootDir, 'src/env', 'prod.ts'));
+      curEnv = require(path.join(rootDir, 'src/environments', 'environment.prod.ts'));
   } else {
-      curEnv = require(path.join(rootDir, 'src/env', 'dev.json'));
+      curEnv = require(path.join(rootDir, 'src/environments', 'environment.dev.json'));
   }
   curEnv.environment = _env;
   return curEnv;
@@ -28,9 +37,9 @@ var envVars;
 try {
   var envFileFullName;
   if (env == 'development') {
-    envFileFullName = 'dev.json';
+    envFileFullName = 'environment.dev.json';
   } else {
-    envFileFullName = 'prod.ts';
+    envFileFullName = 'environment.prod.ts';
   }
   /**
    * on production mode -
@@ -41,7 +50,8 @@ try {
    *  values that hardcoded on the file.
    * */
 
-  envVarDirPath = path.join(rootDir, 'src/env', envFileFullName);
+  envVarDirPath = path.join(rootDir, 'src/environments', envFileFullName);
+  chackFileExists(envVarDirPath);
   envVars = require(envVarDirPath);
 } catch (e) { 
   console.log(e);
