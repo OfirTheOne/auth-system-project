@@ -15,7 +15,7 @@
     "target": "es5",
     "baseUrl": "./src",
     "paths": {
-      "@env": [
+      "environment": [
         "environments/environment.prod" 
       ]
     }
