@@ -79,10 +79,12 @@ config[ionicEnv] = {
     new webpack.EnvironmentPlugin({
     'IONIC_ENV': JSON.stringify(process.env.IONIC_ENV),
     'NODE_ENV': 'development',
-    'API_URL' : JSON.stringify(envVars.API_URL),
-    'FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
-    'GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
-    'GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
+  }),
+  new webpack.DefinePlugin({
+    'process.env.API_URL' : JSON.stringify(envVars.API_URL),
+    'process.env.FB_APP_ID' : JSON.stringify(envVars.FB_APP_ID),
+    'process.env.GGL_CLIENT_ID' : JSON.stringify(envVars.GGL_CLIENT_ID),
+    'process.env.GGL_API_KEY' : JSON.stringify(envVars.GGL_API_KEY)
   })
   ],
 
