@@ -2,7 +2,7 @@ import { AgentAuthService } from './../../services/agent-auth.service';
 import { Component, Inject } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Loading } from 'ionic-angular';
 import { Provider } from '../../models/provider.enum';
-import { EnvVariables } from '../../environments/environment.token';
+import { EnvVariablesToken } from '../../environments/environment.token';
 
 
 @IonicPage()
@@ -12,7 +12,7 @@ import { EnvVariables } from '../../environments/environment.token';
 })
 export class AuthPage {
 
-  constructor(@Inject(EnvVariables) public envVariables,
+  constructor(@Inject(EnvVariablesToken) public envVariables,
     public navCtrl: NavController, 
     public navParams: NavParams,
     private loadingCtrl: LoadingController, 
