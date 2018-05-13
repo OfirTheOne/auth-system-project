@@ -2,12 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 const ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 
-const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
-const rootDir = process.env.IONIC_ROOT_DIR;
-const ionicEnv = process.env.IONIC_ENV || 'dev';
-
-var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
-
 const resolvePathToEnvModule = (ionicEnv) => {
   let curEnvPath;
   if(ionicEnv == 'prod') {
@@ -18,6 +12,26 @@ const resolvePathToEnvModule = (ionicEnv) => {
   return curEnvPath;
 }
 
+const recoverUndefineIonicEnv = (ionicEnv) => {
+  if(!ionicEnv) {
+    if(process.env.NODE_ENV == 'production') {
+      ionicEnv = 'prod';
+    } else {
+      ionicEnv = 'dev';
+    }
+  }
+  return ionicEnv;
+}
+
+
+const appScriptsDir = process.env.IONIC_APP_SCRIPTS_DIR || '@ionic/app-scripts';
+const rootDir = process.env.IONIC_ROOT_DIR;
+const ionicEnv = recoverUndefineIonicEnv(process.env.IONIC_ENV);
+
+console.log(`ionicEnv: ${ionicEnv}`);
+console.log(`process.env.IONIC_ENV: ${process.env.IONIC_ENV}`);
+
+var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 const pathToEnvModule = resolvePathToEnvModule(ionicEnv);
 
 module.exports = function () {
