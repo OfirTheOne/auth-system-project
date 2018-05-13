@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const ionicWebpackFactory = require(process.env.IONIC_WEBPACK_FACTORY);
 console.log(JSON.stringify(process.argv, undefined, 2));
+
 const resolvePathToEnvModule = (ionicEnv) => {
   let curEnvPath;
   if(ionicEnv == 'prod') {
@@ -12,12 +13,13 @@ const resolvePathToEnvModule = (ionicEnv) => {
   return curEnvPath;
 }
 
-const recoverFailedIonicEnv = (ionicEnv) => {
+const recoverFailedIonicEnv = (_ionicEnv) => {
+  let ionicEnv;
   if(process.argv.slice(2).some((arg) => arg.indexOf('--prod') !== -1)) {
     // if the build command contains --prod parameter runover the old value of ionicEnv and set to 'prod'.
     ionicEnv = 'prod';
 
-  } else if(!ionicEnv) {
+  } else if(!_ionicEnv) {
     // if ionicEnv undefine chack the value of NODE_ENV.
     if(process.env.NODE_ENV == 'production') {
       ionicEnv = 'prod';
@@ -26,6 +28,8 @@ const recoverFailedIonicEnv = (ionicEnv) => {
       ionicEnv = 'dev';
 
     }
+  } else {
+    ionicEnv = _ionicEnv;
   }
   return ionicEnv;
 }
@@ -43,6 +47,7 @@ const pathToEnvModule = resolvePathToEnvModule(ionicEnv);
 console.log(`pathToEnvModule : ${pathToEnvModule}`);
 
 module.exports = function () {
+  console.log(`02 - ionicEnv: ${ionicEnv}`);
   // set process.env as a global variable.
   config[ionicEnv].plugins.push(
     new webpack.DefinePlugin({
