@@ -49,7 +49,7 @@ var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 const pathToEnvModule = resolvePathToEnvModule(ionicEnv);
 console.log(`pathToEnvModule : ${pathToEnvModule}`);
 
-module.exports = function () {
+
   console.log(`module.exports - IONIC_ENV: ${process.env.IONIC_ENV}`);
   console.log(`module.exports - NODE_ENV: ${process.env.NODE_ENV}`);
   console.log(`module.exports - ionicEnv: ${ionicEnv}`);
@@ -66,6 +66,25 @@ module.exports = function () {
       "@environment": pathToEnvModule,
   };
   config[ionicEnv].resolve.extensions = ['.ts', '.js', '.json'];
+
+
+module.exports = function () {
+  // console.log(`module.exports - IONIC_ENV: ${process.env.IONIC_ENV}`);
+  // console.log(`module.exports - NODE_ENV: ${process.env.NODE_ENV}`);
+  // console.log(`module.exports - ionicEnv: ${ionicEnv}`);
+  // console.log(`module.exports - pathToEnvModule: ${pathToEnvModule}`);
+
+  // // set process.env as a global variable.
+  // config[ionicEnv].plugins.push(
+  //   new webpack.DefinePlugin({
+  //     'process.env': JSON.stringify(process.env)
+  //   })
+  // );
+  // // set the pat of the alias @environment to the cur env. 
+  // config[ionicEnv].resolve.alias = {
+  //     "@environment": pathToEnvModule,
+  // };
+  // config[ionicEnv].resolve.extensions = ['.ts', '.js', '.json'];
   
   return config;
 }
