@@ -1,18 +1,16 @@
-import { ServerResponse } from './../../models/custom-auth-models/server-response.interface';
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs/Subject";
 import { Subscription } from "rxjs/Subscription";
 import { HttpHeaders } from "@angular/common/http";
-//
-import { GGL_CLIENT_ID, GGL_API_KEY } from "../../data/auth-data"
 
+import { EnvironmentService } from '../environment/environment.service';
 import { UserApiService } from "../user-api/user-api.service";
 import { AuthService } from "../auth-service.interface";
 
+import { ServerResponse } from './../../models/custom-auth-models/server-response.interface';
 import { UserDataBase } from "../../models/user-data-base.interface";
 import { SignInResult } from "../../models/google-auth-models/sign-in-result.interface";
 import { AuthResponse } from '../../models/custom-auth-models/auth-response.interface';
-
 import { UserAuthData } from "../../models/google-auth-models/user-auth-data.interface";
 import { Provider } from "../../models/provider.enum";
 
@@ -41,7 +39,8 @@ export class GoogleAuthService implements AuthService {
     private auth2InitEvent: Subject<void> = new Subject();
     private delayedSignInOnLoadEvent: Subject<void> = new Subject();
 
-    constructor(private userApi: UserApiService) {
+    constructor(private environment: EnvironmentService,private userApi: UserApiService) {
+        console.log(this.environment.getEnv());
         /**
          * doc : 
          *  https://developers.google.com/identity/protocols/OAuth2UserAgent#example
@@ -53,13 +52,13 @@ export class GoogleAuthService implements AuthService {
             // listening to both client and auth2 objects.
             window['gapi'].load('client:auth2', () => {
                 this.auth2 = window['gapi'].auth2.init({
-                    client_id: GGL_CLIENT_ID,
+                    client_id: this.environment.get('GGL_CLIENT_ID'),
                     fetch_basic_profile: true,
                     scope: `profile ${EXTRA_SCOPES}`
                 });
                 window['gapi'].client.init({
-                    'apiKey': GGL_API_KEY,
-                    'clientId': GGL_CLIENT_ID,
+                    'apiKey': this.environment.get('GGL_API_KEY'),
+                    'clientId': this.environment.get('GGL_CLIENT_ID'),
                     'scope': `https://www.googleapis.com/auth/drive.metadata.readonly  ${EXTRA_SCOPES}`,
                     'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
                 });

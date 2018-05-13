@@ -1,7 +1,8 @@
+import { EnvironmentService } from './../environment/environment.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpRequest } from '@angular/common/http';
 
-import { API_URL } from "../../data/auth-data"
+// import { API_URL } from "../../data/auth-data"
 import { AuthResponse } from '../../models/custom-auth-models/auth-response.interface';
 import { ServerResponse } from '../../models/custom-auth-models/server-response.interface';
 import { Provider } from '../../models/provider.enum';
@@ -11,12 +12,13 @@ export class UserApiService {
 
     private readonly curSubRoute = 'users/';
 
-    constructor(private httpClient: HttpClient) { }
+    constructor(private environment: EnvironmentService, private httpClient: HttpClient) { }
 
     public async postSignInUser(provider: Provider, requestBody: { email: string, password: string } | {idToken: string})
         : Promise<HttpResponse<ServerResponse<AuthResponse>>> {
         console.log(`postSignUpUser(${provider}, ${requestBody})`);
-        const queryUrl = API_URL + this.curSubRoute + this.getRouteByProvider(provider);
+        const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 
+                this.getRouteByProvider(provider);
         try {
             const res = await this.httpClient.post<ServerResponse<AuthResponse>>(queryUrl, requestBody,
                 { observe: 'response' }).toPromise();
@@ -32,7 +34,7 @@ export class UserApiService {
     public async deleteUserCurToken(headers: HttpHeaders)
         : Promise<Object> {
             console.log(`deleteUserCurToken(${headers})`);
-            const queryUrl = API_URL + this.curSubRoute + 'me/' + 'token/';
+            const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'me/' + 'token/';
                     
             try {
             const res = await this.httpClient.request('DELETE', queryUrl, 
@@ -47,7 +49,7 @@ export class UserApiService {
     public async getUserData(headers: HttpHeaders)
         : Promise<AuthResponse> {
         console.log(`getUserData(${headers})`);
-        const queryUrl = API_URL + this.curSubRoute + 'me/';
+        const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'me/';
         try {
             const res = await this.httpClient.get<ServerResponse<AuthResponse>>(queryUrl,
                 { headers, observe: 'response' }).toPromise();
@@ -60,7 +62,7 @@ export class UserApiService {
 
     public async postUserData(headers: HttpHeaders, requestBody: { data: {firstName?, lastName?, birthDate?, gender? } }) {
         console.log(`postUserData(${headers}, ${requestBody})`);
-        const queryUrl = API_URL + this.curSubRoute + 'data/';
+        const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'data/';
         try {
             const res = await this.httpClient.post(queryUrl, requestBody,
                 { headers, responseType: 'text' }).toPromise();

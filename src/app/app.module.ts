@@ -14,15 +14,12 @@ import { ProfilePage } from '../pages/profile/profile';
 import { TabsPage } from '../pages/tabs/tabs';
 
 
-import { UserApiService } from './../services/user-api/user-api.service';
+import { UserApiService } from '../services/user-api/user-api.service';
 import { GoogleAuthService } from '../services/google-auth/google-auth.service';
 import { FacebookAuthService } from '../services/facebook-auth/facebook-auth.service';
 import { CustomAuthService } from '../services/custom-auth/custom-auth.service';
 import { AgentAuthService } from '../services/agent-auth.service';
-import { EnvironmentsModule } from '../environments/environment.module';
-
-
-
+import { EnvironmentService } from '../services/environment/environment.service';
 
 
 @NgModule({
@@ -36,7 +33,6 @@ import { EnvironmentsModule } from '../environments/environment.module';
     BrowserModule,
     HttpClientModule,
     IonicModule.forRoot(MyApp),
-    EnvironmentsModule,
     AuthPageModule,
     ProfilePageModule
   ],
@@ -51,6 +47,7 @@ import { EnvironmentsModule } from '../environments/environment.module';
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
+    EnvironmentService,
     GoogleAuthService,
     FacebookAuthService,
     UserApiService,

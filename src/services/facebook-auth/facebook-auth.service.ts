@@ -1,17 +1,17 @@
-import { UserApiService } from './../user-api/user-api.service';
-import { UserDataBase } from './../../models/user-data-base.interface';
-import { AuthResponse } from './../../models/custom-auth-models/auth-response.interface';
+import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from "@angular/core";
-// import { FB_APP_ID } from "../../data/auth-data"
-
-import { AuthService } from "../auth-service.interface";
-import { Provider } from "../../models/provider.enum";
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { HttpHeaders } from '@angular/common/http';
+
+import { EnvironmentService } from '../environment/environment.service';
+import { AuthService } from "../auth-service.interface";
+import { UserApiService } from './../user-api/user-api.service';
+
+import { UserDataBase } from './../../models/user-data-base.interface';
+import { AuthResponse } from './../../models/custom-auth-models/auth-response.interface';
+import { Provider } from "../../models/provider.enum";
 
 
-const FB_APP_ID = '';//"193767451426342";
 @Injectable()
 export class FacebookAuthService implements AuthService {
 
@@ -21,7 +21,7 @@ export class FacebookAuthService implements AuthService {
 
     private udb: UserDataBase;
 
-    constructor(private userApi: UserApiService) {
+    constructor(private environment: EnvironmentService, private userApi: UserApiService) {
         this.facebookAuthInit();
     }
 
@@ -117,7 +117,7 @@ export class FacebookAuthService implements AuthService {
          */
         window['fbAsyncInit'] = () => {
             window['FB'].init({
-                appId: FB_APP_ID,
+                appId: this.environment.get('FB_APP_ID'),
                 autoLogAppEvents: true,
                 xfbml: true,
                 version: 'v2.12',
