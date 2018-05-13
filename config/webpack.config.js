@@ -33,6 +33,7 @@ console.log(`process.env.IONIC_ENV: ${process.env.IONIC_ENV}`);
 
 var config = require(path.join(appScriptsDir, 'config', 'webpack.config.js'));
 const pathToEnvModule = resolvePathToEnvModule(ionicEnv);
+console.log(`pathToEnvModule : ${pathToEnvModule}`);
 
 module.exports = function () {
   // set process.env as a global variable.
