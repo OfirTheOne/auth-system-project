@@ -3,24 +3,27 @@ import { HttpHeaders } from '@angular/common/http';
 import * as moment from 'moment';
 
 import { UserApiService } from '../user-api/user-api.service';
+import { AuthStrategyService } from '../auth-strategy-service.abstract';
 
-import { AuthService } from '../auth-service.interface';
-import { UserDataBase } from '../../models/user-data-base.interface';
 import { Provider } from '../../models/provider.enum';
+import { UserDataBase } from '../../models/user-data-base.interface';
 import { AuthResponse } from '../../models/custom-auth-models/auth-response.interface';
+import { ServerResponse } from '../../models/custom-auth-models/server-response.interface';
 
 @Injectable()
-export class CustomAuthService implements AuthService {
+export class CustomAuthStrategyService extends AuthStrategyService {
 
-    private udb: UserDataBase;
+    constructor(userApi: UserApiService) {
+        super(Provider.CUSTOM_PROVIDER, 'custom', userApi);
+    }
 
-    constructor(private userApi: UserApiService) { }
+    public async onSignIn(params?: {email, password }): Promise<AuthResponse> {
+        console.log(`CAS.getAuthHeader(${params})`);
 
-    //#region - user actions / talk with server
-    public async onSignIn(params: signInParams): Promise<AuthResponse> {
         let res;
         try {
-            res = await this.userApi.postSignInUser(Provider.CUSTOM_PROVIDER, params.data);
+            res = await this._signInToServer({data: params})
+            // userApi.postSignInUser(Provider.CUSTOM_PROVIDER, params.data);
             console.log(res, res.body.data.tokenData);
             this.setSession(res.body.data.tokenData);
             this.udb = res.body.data.user; 
@@ -33,13 +36,15 @@ export class CustomAuthService implements AuthService {
     }
 
     public async onSignOut(): Promise<void> {
+        console.log(`CAS.onSignOut()`);
+
         const headers = this.getAuthHeader();
 
         // first token removeing from local storage than removing from the db, UX consideration
 
         this.removeTokenFromLocal();
         try {
-            const res = await this.userApi.deleteUserCurToken(headers);
+            const res = await this._signOutFromServer(headers);
             console.log(res);
             
         } catch (e) {
@@ -49,9 +54,8 @@ export class CustomAuthService implements AuthService {
 
     }
 
-    //#endregion
-
     public isSignIn(): boolean {
+        console.log(`CAS.isSignIn()`);
         const tokenStatus = moment().isBefore(this.getExpiration());
         if (!tokenStatus) {
             this.removeTokenFromLocal();
@@ -59,20 +63,25 @@ export class CustomAuthService implements AuthService {
         return tokenStatus && this.udb != undefined;
     }
 
-    public getProfile(): UserDataBase {
-        return this.udb;
-    }
-
-    public getProvider(): Provider {
-        return Provider.CUSTOM_PROVIDER;
-    }
-
     public getAuthHeader(): HttpHeaders {
-        return new HttpHeaders({ 'x-auth': this.getToken(), 'x-provider': 'custom' })
+        console.log(`CAS.getAuthHeader()`);
+
+        return this._buildAuthHeader(this.getToken());
     }
     
+    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
+        return true;
+    }
 
-    //#region - private methods - token related 
+
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+
+    
     private getToken() {
         return localStorage.getItem('token');
     }
@@ -94,15 +103,5 @@ export class CustomAuthService implements AuthService {
         localStorage.removeItem("token");
         localStorage.removeItem("exp_date");
     }
-    //#endregion 
-
 }
 
-interface signInParams {
-    data: {
-        email,
-        password,
-        firstName?,
-        lastName?,
-    }
-}

@@ -4,58 +4,61 @@ import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 
 import { EnvironmentService } from '../environment/environment.service';
-import { AuthService } from "../auth-service.interface";
+import { AuthStrategyService } from "../auth-strategy-service.abstract";
 import { UserApiService } from './../user-api/user-api.service';
 
 import { UserDataBase } from './../../models/user-data-base.interface';
 import { AuthResponse } from './../../models/custom-auth-models/auth-response.interface';
 import { Provider } from "../../models/provider.enum";
+import { ServerResponse } from '../../models/custom-auth-models/server-response.interface';
 
-
+/**
+ * doc - https://developers.facebook.com/docs/facebook-login/web#example
+ * 
+*/
 @Injectable()
-export class FacebookAuthService implements AuthService {
+export class FacebookAuthStrategyService extends AuthStrategyService {
 
     private fbAuth;
     private fbAuthInitEvent: Subject<void> = new Subject();
     private isfbAuthInit = false;
 
-    private udb: UserDataBase;
 
-    constructor(private environment: EnvironmentService, private userApi: UserApiService) {
+    constructor(private environment: EnvironmentService, userApi: UserApiService) {
+        super(Provider.FACEBOOK_PROVIDER, 'facebook', userApi);
+        /*
         this.facebookAuthInit();
+        */
     }
 
-    //#region :: public AuthService API mathods
-
-    public async onSignIn(): Promise<AuthResponse> {
+    public async onSignIn(params = undefined): Promise<AuthResponse> {
         /**
          * doc : 
          *  https://developers.facebook.com/docs/reference/javascript/FB.login/v2.12
          *  scope - https://developers.facebook.com/docs/facebook-login/permissions
          */
-        const res = await this.fbAuth.login(undefined, { scope: 'public_profile,email' });
+        const res: FBAuthResponse = await this.fbAuth.login(undefined, { scope: 'public_profile,email' });
         console.log(res);
         if (res != undefined && res.status === 'connected') {
 
+            const {authResponse} = res
             // sign in the user using server.
-            const serverRes = await this.userApi.postSignInUser(Provider.FACEBOOK_PROVIDER, { idToken: '' });
-            this.udb = serverRes.body.data.user;
-            return serverRes.body.data;
-
-            // await this.setProfileData();
+            return await this._signInToServer({token: authResponse.accessToken});
         } else {
             console.log('The person is not logged into this app or we are unable to tell.')
         }
         return null;
-    };
+    }
 
     public async onSignOut() {
         /**
          * doc : 
          *  https://developers.facebook.com/docs/facebook-login/web#logout
          */
+        const headers = this.getAuthHeader();
         const res = await this.fbAuth.logout();
         this.udb = undefined;
+        await this._signOutFromServer(headers);
         console.log(res);
     }
 
@@ -67,29 +70,39 @@ export class FacebookAuthService implements AuthService {
         if (this.fbAuth == undefined) {
             return false;
         } else {
-            const res = this.fbAuth.getAuthResponse();
-            if (res == null || res == undefined) {
+            const authRes = this.fbAuth.getAuthResponse();
+            if (authRes == null || authRes == undefined) {
                 return false;
             }
         }
-    }
-
-    public getProfile(): UserDataBase {
-        return this.udb;
-    }
-
-    public getProvider(): Provider {
-        return Provider.FACEBOOK_PROVIDER;
+        return true;
     }
 
     public getAuthHeader(): HttpHeaders {
-        // return x-provider and x-auth
-        return null;
+        const authRes = this.fbAuth.getAuthResponse();
+        console.log(authRes);
+        const token = authRes.accessToken;
+        return this._buildAuthHeader(token);
     }
-    //#endregion
+
+    
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
 
 
-    //#region :: public resource initialized methods
+    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
+        const { authValue } = res.data;
+        console.log(authValue);
+        const authRes = this.fbAuth.getAuthResponse();
+        console.log(authRes);
+        const authuid = authRes.userID;
+        return authValue === authuid;
+    }
+
 
     /** @description subscribe to auth resource done initializing event. 
      * @param {function=} callback Optional callback.
@@ -105,15 +118,12 @@ export class FacebookAuthService implements AuthService {
     public isAuthResourceInit() {
         return this.isfbAuthInit;
     }
-    //#endregion ***
-
-
-    //#region :: private methods
 
     private facebookAuthInit() {
         /**
          * doc : 
          *  https://developers.facebook.com/docs/javascript/quickstart
+         *  https://developers.facebook.com/docs/javascript/reference/FB.init/v3.0
          */
         window['fbAsyncInit'] = () => {
             window['FB'].init({
@@ -171,15 +181,14 @@ export class FacebookAuthService implements AuthService {
 
     */
 
-    //#endregion
 }
 
 interface FBAuthResponse {
-    status: 'connected',
+    status: string,
     authResponse: {
-        accessToken: '...',
-        expiresIn: '...',
-        signedRequest: '...',
-        userID: '...'
+        accessToken: string,
+        expiresIn: string,
+        signedRequest: string,
+        userID: string
     }
 }

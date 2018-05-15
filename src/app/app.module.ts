@@ -15,9 +15,9 @@ import { TabsPage } from '../pages/tabs/tabs';
 
 
 import { UserApiService } from '../services/user-api/user-api.service';
-import { GoogleAuthService } from '../services/google-auth/google-auth.service';
-import { FacebookAuthService } from '../services/facebook-auth/facebook-auth.service';
-import { CustomAuthService } from '../services/custom-auth/custom-auth.service';
+import { GoogleAuthStrategyService } from '../services/google-auth/google-auth.service';
+import { FacebookAuthStrategyService } from '../services/facebook-auth/facebook-auth.service';
+import { CustomAuthStrategyService } from '../services/custom-auth/custom-auth.service';
 import { AgentAuthService } from '../services/agent-auth.service';
 import { EnvironmentService } from '../services/environment/environment.service';
 
@@ -48,10 +48,10 @@ import { EnvironmentService } from '../services/environment/environment.service'
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     EnvironmentService,
-    GoogleAuthService,
-    FacebookAuthService,
     UserApiService,
-    CustomAuthService,
+    GoogleAuthStrategyService,
+    FacebookAuthStrategyService,
+    CustomAuthStrategyService,
     AgentAuthService
   ]
 })

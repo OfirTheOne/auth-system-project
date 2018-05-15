@@ -1,22 +1,25 @@
-import { UserDataBase } from './../models/user-data-base.interface';
+import { stagger } from '\@angular/animations';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 
-import { CustomAuthService as CAS } from './custom-auth/custom-auth.service';
-import { GoogleAuthService as GAS } from './google-auth/google-auth.service';
-import { FacebookAuthService as FAS } from './facebook-auth/facebook-auth.service';
+import { AuthStrategyService } from './auth-strategy-service.abstract';
+import { CustomAuthStrategyService as CAS } from './custom-auth/custom-auth.service';
+import { GoogleAuthStrategyService as GAS } from './google-auth/google-auth.service';
+import { FacebookAuthStrategyService as FAS } from './facebook-auth/facebook-auth.service';
 import { UserApiService as UAS } from './user-api/user-api.service';
 
-
-import { AuthService } from './auth-service.interface';
+import { UserDataBase } from './../models/user-data-base.interface';
 import { Provider } from './../models/provider.enum';
 
 @Injectable()
 export class AgentAuthService {
 
-    // class member, contains the current authService strategy according to what the user chooses.
-    private authService: AuthService;
+    // oobject that manage the declared provider in the local storage
+    private pdm: ProviderDeclaretionManeger = new ProviderDeclaretionManeger();
+
+    // class member, contains the current authStrategy strategy according to what the user chooses.
+    private authStrategy: AuthStrategyService;
 
     // event, dispatch when all auth related resources are loaded,
     // when google and facebook plugin is loaded.  
@@ -27,85 +30,68 @@ export class AgentAuthService {
     // flag, set to true when all auth related resources are loaded.
     private isAuthResInit: boolean = false;
 
-    constructor(private custom: CAS, private google: GAS, private facebook: FAS, private userApi: UAS) {
+    constructor(
+        private custom: CAS, // auth strategy 01
+        private google: GAS, // auth strategy 02
+        private facebook: FAS, // auth strategy 03
+    ) {
 
-        let g_init = false;
-        let f_init = false;
-        /*
-        let c_init = false;
-        */
-        this.google.authResInitEventSubscribe(() => {
-            g_init = true;
-            this.chackIsAuthResInit(g_init, f_init, true);
-        });
-        this.facebook.authResInitEventSubscribe(() => {
-            f_init = true;
-            this.chackIsAuthResInit(g_init, f_init, true);
-        });
-        /*
-        this.google.delayedSignInOnLoadEventSubscribe(() => {
-            this.userStatusChangeEvent.next();
-            this.setStrategy(Provider.GOOGLE_PROVIDER);
-        });
-        */
+        this.setStrategyByDeclaredProvider();
+        this.waitForAllResInit();
+
+
     }
 
-    //#region - user actions / talk with server
+    /************ public methods ************/
 
     public async onSignIn(params?) {
-        if (this.authService == undefined) {
+        if (this.authStrategy == undefined) {
             throw new Error('Auth service is not initialized');
         } else {
-            const res = await this.authService.onSignIn(params);
+            const res = await this.authStrategy.onSignIn(params);
+            this.pdm.declareProvider(this.authStrategy.getProviderName());
             this.userStatusChangeEvent.next();
             return res;
         }
     }
 
     public async onSignOut() {
-        if (this.authService == undefined) {
+        if (this.authStrategy == undefined) {
             throw new Error('Auth service is not initialized');
         } else {
-            const res = await this.authService.onSignOut();
+            const res = await this.authStrategy.onSignOut();
+            this.pdm.undeclareProvider();
             this.userStatusChangeEvent.next();
             return res;
         }
     }
 
-    public async onUpdateUserData(userData) {
-        const headers = this.authService.getAuthHeader();
-        const body = { data: userData };
-        try {
-            const res = await this.userApi.postUserData(headers, body);
-            console.log(res);
-            return res;
-        } catch (e) {
-            console.log(e);
+    public isSignIn(): boolean {
+        if (this.authStrategy == undefined) {
+            return false;
+        } else {
+            return this.authStrategy.isSignIn();
         }
     }
 
-    //#endregion
-
-    //#region - cur signed session data getters and setters
-
-    public isSignIn(): boolean {
-        if (this.authService == undefined) {
-            return false;
-        } else {
-            return this.authService.isSignIn();
+    public async onUpdateUserData(userData) {
+        try {
+            await this.authStrategy.onUpdateUserData(userData);
+        } catch (e) {
+            console.log(e);
         }
     }
 
     public setStrategy(authProvider: Provider): void {
         switch (authProvider) {
             case Provider.CUSTOM_PROVIDER:
-                this.authService = this.custom;
+                this.authStrategy = this.custom;
                 break;
             case Provider.GOOGLE_PROVIDER:
-                this.authService = this.google;
+                this.authStrategy = this.google;
                 break;
             case Provider.FACEBOOK_PROVIDER:
-                /*this.authService = this.facebook;*/
+                this.authStrategy = this.facebook;
                 break;
             default:
                 break;
@@ -113,18 +99,16 @@ export class AgentAuthService {
     }
 
     public getProfile(): undefined | UserDataBase {
-        if (this.authService != undefined) {
-            return this.authService.getProfile();
+        if (this.authStrategy != undefined) {
+            return this.authStrategy.getProfile();
         }
     }
 
     public getProvider(): undefined | Provider {
-        return this.authService ? this.authService.getProvider() : undefined;
+        return this.authStrategy ? this.authStrategy.getProvider() : undefined;
     }
 
-    //#endregion
-
-    //#region - auth resourse releted methods and events subscribing
+    // signIn events related
 
     public getIsAuthResInit(): boolean {
         return this.isAuthResInit;
@@ -138,9 +122,8 @@ export class AgentAuthService {
         return this.userStatusChangeEvent.subscribe(callback);
     }
 
-    //#endregion
 
-    //#region - private methods
+    /************ private methods ************/
 
     private chackIsAuthResInit(g: boolean, f: boolean, c: boolean): void {
         if (g && f && c) {
@@ -151,7 +134,7 @@ export class AgentAuthService {
     }
 
     private isUserSignInOnLoad() {
-        this.authService = [this.google, /*this.facebook,*/ this.custom]
+        this.authStrategy = [this.google, this.facebook, this.custom]
             .find((auth) => {
                 const res = auth.isSignIn();
                 return res;
@@ -159,7 +142,7 @@ export class AgentAuthService {
     }
 
     private cleanAllSignInProviders() {
-        const authProviders = this.getAuthProvidersArray();
+        const authProviders = this.getAuthStrategyArray();
         authProviders.forEach(async (auth) => {
             if (auth.isSignIn()) {
                 await auth.onSignOut();
@@ -167,9 +150,51 @@ export class AgentAuthService {
         })
     }
 
-    private getAuthProvidersArray(): AuthService[] {
+    private getAuthStrategyArray(): AuthStrategyService[] {
         return [this.custom, this.google, this.facebook];
     }
 
-    //#endregion
+    /* used once in the c'tor */
+    private setStrategyByDeclaredProvider() {
+        const strategyArray = this.getAuthStrategyArray();
+        this.authStrategy = strategyArray.find((strategy) => {
+            return strategy.getProviderName() == this.pdm.getDeclaredProvider();
+        });
+    }
+
+    /* used once in the c'tor */
+    private waitForAllResInit() {
+        let g_init = false;
+        let f_init = true;
+
+        this.google.authResInitEventSubscribe(() => {
+            g_init = true;
+            this.chackIsAuthResInit(g_init, f_init, true);
+        });
+        this.facebook.authResInitEventSubscribe(() => {
+            f_init = true;
+            this.chackIsAuthResInit(g_init, f_init, true);
+        });
+    }
+
+}
+
+class ProviderDeclaretionManeger {
+    private readonly keyName = 'sign_p';
+
+    public declareProvider(providerName: string): void {
+        localStorage.setItem(this.keyName, providerName)
+    }
+
+    public undeclareProvider(): void {
+        localStorage.removeItem(this.keyName);
+    }
+
+    public isDeclared(): boolean {
+        return localStorage.getItem(this.keyName) != undefined;
+    }
+
+    public getDeclaredProvider() : string {
+        return localStorage.getItem(this.keyName);
+    }
 }

@@ -5,7 +5,7 @@ import { HttpHeaders } from "@angular/common/http";
 
 import { EnvironmentService } from '../environment/environment.service';
 import { UserApiService } from "../user-api/user-api.service";
-import { AuthService } from "../auth-service.interface";
+import { AuthStrategyService } from "../auth-strategy-service.abstract";
 
 import { ServerResponse } from './../../models/custom-auth-models/server-response.interface';
 import { UserDataBase } from "../../models/user-data-base.interface";
@@ -28,19 +28,82 @@ const EXTRA_SCOPES = "https://www.googleapis.com/auth/plus.login https://www.goo
  */
 
 @Injectable()
-export class GoogleAuthService implements AuthService {
-
+export class GoogleAuthStrategyService extends AuthStrategyService {
 
 
     // reasurce
     private auth2;
-    private udb: UserDataBase;
     private isAuth2Init = false;
     private auth2InitEvent: Subject<void> = new Subject();
     private delayedSignInOnLoadEvent: Subject<void> = new Subject();
 
-    constructor(private environment: EnvironmentService,private userApi: UserApiService) {
-        console.log(this.environment.getEnv());
+    constructor(private environment: EnvironmentService, userApi: UserApiService) {
+        super(Provider.GOOGLE_PROVIDER, 'google', userApi);
+        this.googleAuthInit();
+    }
+
+    public async onSignIn(): Promise<AuthResponse> {
+        console.log(`GAS.onSignIn()`);
+        // auth2 is init 
+        if (this.isAuth2Init) {
+
+            // sign in the user using google services.
+            const res = await this.auth2.signIn();
+            console.log('User signed in.');
+            const token = res.Zi.id_token;
+            return await this._signInToServer({ token });
+        } else {
+            throw new Error('the auth2 object is\'nt initialized');
+        }
+    }
+
+    public async onSignOut(): Promise<void> {
+        console.log(`GAS.onSignOut()`);
+
+        if (this.isAuth2Init && this.auth2.isSignedIn.get()) {
+
+            const headers = this.getAuthHeader();
+            await this.auth2.signOut(); // this method do have no return value
+            console.log('User signed out.');
+
+            await this._signOutFromServer(headers);
+
+        } else {
+            throw new Error('the user is\'nt sign in or the auth2 object is\'nt initialized');
+        }
+    }
+
+    /**
+     * @returns true if the current user is currently signed in. 
+     * if the auth2 object is not initialized it will return false.
+     */
+    public isSignIn(): boolean {
+        console.log(`GAS.isSignIn()`);
+
+        if (this.isAuth2Init) {
+            return (this.auth2.isSignedIn.get() && this.udb != undefined);
+        } else {
+            return false;
+        }
+    }
+
+    public getAuthHeader(): HttpHeaders {
+        console.log(`GAS.getAuthHeader()`);
+
+        const token = this.getUserAuthData().id_token;
+        return this._buildAuthHeader(token);
+    }
+
+
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+    // ************************************************************************ //
+
+
+    private googleAuthInit() {
         /**
          * doc : 
          *  https://developers.google.com/identity/protocols/OAuth2UserAgent#example
@@ -99,86 +162,6 @@ export class GoogleAuthService implements AuthService {
         }
     }
 
-
-    //#region :: public AuthService API mathods
-
-    public async onSignIn(): Promise<AuthResponse> {
-
-        // auth2 is init 
-        if (this.isAuth2Init) {
-
-            // sign in the user using google services.
-            const res = await this.auth2.signIn();
-            console.log('User signed in.');
-            const tok = res.Zi.id_token;
-            return await this.signInToServer(tok);
-        } else {
-            throw new Error('the auth2 object is\'nt initialized');
-        }
-    }
-
-    private async signInToServer(token: string) {
-
-        // sign in the user using server.
-        const serverRes = await this.userApi.postSignInUser(Provider.GOOGLE_PROVIDER, { idToken: token });
-
-        // authenticate the server response. / validating the returned user id.
-        this.authenticateServerResponse(serverRes.body);
-
-        // saving the signed user data in the service.
-        this.udb = serverRes.body.data.user;
-
-        return serverRes.body.data;
-    }
-
-    public async onSignOut(): Promise<void> {
-        if (this.isAuth2Init && this.auth2.isSignedIn.get()) {
-
-            const headers = this.getAuthHeader();
-            await this.auth2.signOut(); // this method do have no return value
-            console.log('User signed out.');
-
-            await this.userApi.deleteUserCurToken(headers);
-
-        } else {
-            throw new Error('the user is\'nt sign in or the auth2 object is\'nt initialized');
-        }
-    }
-
-    /**
-     * @returns true if the current user is currently signed in. 
-     * if the auth2 object is not initialized it will return false.
-     */
-    public isSignIn(): boolean {
-        if (this.isAuth2Init) {
-            return (this.auth2.isSignedIn.get() && this.udb != undefined);
-        } else {
-            return false;
-        }
-    }
-
-    public getProfile(): undefined | UserDataBase {
-        if (this.isAuth2Init && this.auth2.isSignedIn.get()) {
-            return this.udb;
-        } else {
-            console.log('the user is\'nt sign in');
-        }
-    }
-
-    public getProvider(): Provider {
-        return Provider.GOOGLE_PROVIDER;
-    }
-
-    public getAuthHeader(): HttpHeaders {
-        const tok = this.getUserAuthData().id_token;
-        return new HttpHeaders({ 'x-auth': tok, 'x-provider': 'google' })
-    }
-
-    //#endregion 
-
-
-    //#region :: public resource initialized methods
-
     /** @description subscribe to auth resource done initializing event. 
      * @param {function=} callback Optional callback.
      * @returns {Subscription} subscription object from this event subscribing.
@@ -203,12 +186,6 @@ export class GoogleAuthService implements AuthService {
         return this.isAuth2Init;
     }
 
-    //#endregion 
-
-
-    //#region :: private methods
-
-
     private getUserAuthData(): undefined | UserAuthData {
         // doc : https://developers.google.com/identity/sign-in/web/reference#googleauthcurrentuserget
         if (this.auth2.isSignedIn.get()) {
@@ -220,14 +197,10 @@ export class GoogleAuthService implements AuthService {
         }
     }
 
-    private authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
+    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
         const { authValue } = res.data;
         const authuid = this.auth2.currentUser.get().getBasicProfile().getId();
         return authValue === authuid;
     }
-
-    //#endregion ******
-
-
 
 }
