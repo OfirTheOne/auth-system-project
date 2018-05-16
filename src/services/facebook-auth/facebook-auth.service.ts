@@ -41,6 +41,7 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         if (res != undefined && res.status === 'connected') {
 
             const {authResponse} = res
+            console.log(res);
             // sign in the user using server.
             return await this._signInToServer({token: authResponse.accessToken});
         } else {
