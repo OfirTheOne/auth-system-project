@@ -26,9 +26,8 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
 
     constructor(private environment: EnvironmentService, userApi: UserApiService) {
         super(Provider.FACEBOOK_PROVIDER, 'facebook', userApi);
-        /*
+        
         this.facebookAuthInit();
-        */
     }
 
     public async onSignIn(params = undefined): Promise<AuthResponse> {
@@ -153,33 +152,6 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
     }
-
-    /*
-    
-    private async setProfileData() {
-        
-         // doc  : 
-         //  https://developers.facebook.com/docs/graph-api/reference/user/#Reading
-        
-        const res = await this.fbAuth.api('/me');
-        console.log(res);
-        this.userProfile = this.parseToProfile(res);
-    }
-
-    private parseToProfile(profileData): Profile {
-        const profile: Profile = {
-            email: profileData.email,
-            id: profileData.id,
-            fullName: profileData.name,
-            givenName: profileData.first_name,
-            familyName: profileData.last_name,
-            imageUrl: profileData.cover,
-            provider: Provider.FACEBOOK_PROVIDER
-        }
-        return profile;
-    }
-
-    */
 
 }
 

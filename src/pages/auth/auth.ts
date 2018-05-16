@@ -42,8 +42,14 @@ export class AuthPage {
   }
 
   async fbSignIn() {
-    /*this.agentAuthService.setStrategy(Provider.FACEBOOK_PROVIDER);
-    this.agentAuthService.onSignIn();*/
+    try {
+
+    this.agentAuthService.setStrategy(Provider.FACEBOOK_PROVIDER);
+    const res =  this.agentAuthService.onSignIn();
+    console.log(res);
+  } catch (ex) {
+    console.log(ex);
+  }
   }
 
   async ctSignIn() {
