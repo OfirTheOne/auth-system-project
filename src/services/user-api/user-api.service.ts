@@ -14,16 +14,17 @@ export class UserApiService {
 
     constructor(private environment: EnvironmentService, private httpClient: HttpClient) { }
 
-    public async postSignInUser(provider: Provider, requestBody: { email: string, password: string } | {idToken: string})
+    public async postSignInUser(provider: Provider, requestBody: { email: string, password: string } | { idToken: string })
         : Promise<HttpResponse<ServerResponse<AuthResponse>>> {
         console.log(`postSignUpUser(${provider}, ${requestBody})`);
-        const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 
-                this.getRouteByProvider(provider);
+        const queryUrl = this.environment.get('API_URL') + this.curSubRoute +
+            this.getRouteByProvider(provider);
         try {
             const res = await this.httpClient.post<ServerResponse<AuthResponse>>(queryUrl, requestBody,
                 { observe: 'response' }).toPromise();
             console.log(res);
             return res;
+
         } catch (e) {
             throw e;
         }
@@ -33,12 +34,12 @@ export class UserApiService {
     // removing. in the option of the request, the observe, and adding responseType: 'text' fix it.
     public async deleteUserCurToken(headers: HttpHeaders)
         : Promise<Object> {
-            console.log(`deleteUserCurToken(${headers})`);
-            const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'me/' + 'token/';
-                    
-            try {
-            const res = await this.httpClient.request('DELETE', queryUrl, 
-                { headers,  responseType: 'text' }).toPromise();
+        console.log(`deleteUserCurToken(${headers})`);
+        const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'me/' + 'token/';
+
+        try {
+            const res = await this.httpClient.request('DELETE', queryUrl,
+                { headers, responseType: 'text' }).toPromise();
             console.log(res);
             return res;
         } catch (e) {
@@ -60,7 +61,7 @@ export class UserApiService {
         }
     }
 
-    public async postUserData(headers: HttpHeaders, requestBody: { data: {firstName?, lastName?, birthDate?, gender? } }) {
+    public async postUserData(headers: HttpHeaders, requestBody: { data: { firstName?, lastName?, birthDate?, gender?} }) {
         console.log(`postUserData(${headers}, ${requestBody})`);
         const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'data/';
         try {

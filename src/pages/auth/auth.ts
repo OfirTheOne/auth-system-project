@@ -3,6 +3,7 @@ import { Component, Inject } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Loading } from 'ionic-angular';
 import { Provider } from '../../models/provider.enum';
 import { AgentAuthService } from '../../services/agent-auth.service';
+import { EnvironmentService } from '../../services/environment/environment.service';
 
 
 @IonicPage()
@@ -16,7 +17,8 @@ export class AuthPage {
     public navCtrl: NavController, 
     public navParams: NavParams,
     private loadingCtrl: LoadingController, 
-    private agentAuthService: AgentAuthService) {
+    private agentAuthService: AgentAuthService,
+    private environment: EnvironmentService) {
       if (!this.agentAuthService.getIsAuthResInit()) {
         const loader = this.presentLoading('loading');
         this.agentAuthService.authResInitEventSubscribe(() => {
@@ -43,10 +45,17 @@ export class AuthPage {
 
   async fbSignIn() {
     try {
-
-    this.agentAuthService.setStrategy(Provider.FACEBOOK_PROVIDER);
-    const res =  this.agentAuthService.onSignIn();
-    console.log(res);
+      this.agentAuthService.setStrategy(Provider.FACEBOOK_PROVIDER);
+      if(this.environment.isDev()) {
+        const fakeBody = {token: "EAABuxssE9ZA4BAIWiRZAZBbUmG9kORlPQKXkC4pabQyYmzvVRUKUza63BVJmoWpRG6oyijZC18BcplD87xmGASFwDuJfWUDGWD3TxM5OdhMNdWM3qccIVr23BJCuXyMZCx3S8uZBKQUiq0LZCC823Gcf4gJDylZBdxAptEHydoTsaAFs1PU0RUlMWcXJS1j9wpWtJDwypsmFTAZDZD"};
+        const res =  this.agentAuthService.onSignIn(fakeBody);
+        console.log(res);
+      } else {
+        const res =  this.agentAuthService.onSignIn();
+        console.log(res);
+      }
+  
+    
   } catch (ex) {
     console.log(ex);
   }

@@ -108,6 +108,7 @@ export class AgentAuthService {
         return this.authStrategy ? this.authStrategy.getProvider() : undefined;
     }
 
+    
     // signIn events related
 
     public getIsAuthResInit(): boolean {

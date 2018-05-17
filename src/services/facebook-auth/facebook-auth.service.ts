@@ -26,8 +26,9 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
 
     constructor(private environment: EnvironmentService, userApi: UserApiService) {
         super(Provider.FACEBOOK_PROVIDER, 'facebook', userApi);
-        
-        this.facebookAuthInit();
+        if(this.environment.isProd()) {
+            this.facebookAuthInit();
+        }
     }
 
     public async onSignIn(params = undefined): Promise<AuthResponse> {
@@ -36,6 +37,9 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
          *  https://developers.facebook.com/docs/reference/javascript/FB.login/v2.12
          *  scope - https://developers.facebook.com/docs/facebook-login/permissions
          */
+        if(this.environment.isDev()) {
+            return await this._signInToServer(params);
+        }
         const res: FBAuthResponse = await this.fbAuth.login(undefined, { scope: 'public_profile,email' });
         console.log(res);
         if (res != undefined && res.status === 'connected') {

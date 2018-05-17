@@ -4,6 +4,9 @@ import { Injectable } from "@angular/core";
 @Injectable()
 export class EnvironmentService {
 
+    private readonly PRODUCTION_MODE_NAMESPACE = 'prod';
+    private readonly DEVELOPMENT_MODE_NAMESPACE = 'dev';
+
     private env: {[key: string]: string | undefined};
     
     constructor() {
@@ -23,5 +26,13 @@ export class EnvironmentService {
     getEnv(): {[key: string]: string | undefined} {
         console.log(`getEnv()`);
         return this.env;
+    }
+
+    isProd(): boolean {
+        return this.env['CUR_ENV'] == this.PRODUCTION_MODE_NAMESPACE; 
+    }
+
+    isDev(): boolean {
+        return this.env['CUR_ENV'] == this.DEVELOPMENT_MODE_NAMESPACE; 
     }
 }
