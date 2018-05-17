@@ -26,7 +26,7 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
 
     constructor(private environment: EnvironmentService, userApi: UserApiService) {
         super(Provider.FACEBOOK_PROVIDER, 'facebook', userApi);
-        if(this.environment.isProd()) {
+        if (this.environment.isProd()) {
             this.facebookAuthInit();
         }
     }
@@ -37,20 +37,36 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
          *  https://developers.facebook.com/docs/reference/javascript/FB.login/v2.12
          *  scope - https://developers.facebook.com/docs/facebook-login/permissions
          */
-        if(this.environment.isDev()) {
+        if (this.environment.isDev()) {
             return await this._signInToServer(params);
         }
-        const res: FBAuthResponse = await this.fbAuth.login(undefined, { scope: 'public_profile,email' });
+        const res: FBAuthResponse = await this.fbLogin({ scope: 'public_profile,email' });
         console.log(res);
         if (res != undefined && res.status === 'connected') {
 
-            const {authResponse} = res
+            const { authResponse } = res
             console.log(res);
             // sign in the user using server.
-            return await this._signInToServer({token: authResponse.accessToken});
+            return await this._signInToServer({ token: authResponse.accessToken });
         } else {
             console.log('The person is not logged into this app or we are unable to tell.')
         }
+        /*
+        await this.fbAuth.login(
+            async () => {
+
+                console.log(res);
+                if (res != undefined && res.status === 'connected') {
+                    
+                    const {authResponse} = res
+                    console.log(res);
+                    // sign in the user using server.
+                    return await this._signInToServer({token: authResponse.accessToken});
+                } else {
+                    console.log('The person is not logged into this app or we are unable to tell.')
+                }
+            }, { scope: 'public_profile,email' });
+            */
         return null;
     }
 
@@ -89,7 +105,7 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         return this._buildAuthHeader(token);
     }
 
-    
+
     // ************************************************************************ //
     // ************************************************************************ //
     // ************************************************************************ //
@@ -156,6 +172,15 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
             js.src = "https://connect.facebook.net/en_US/sdk.js";
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
+    }
+
+    private async fbLogin(params):Promise<FBAuthResponse> {
+        const wraper = await new Promise<FBAuthResponse>((resolve, reject) => {
+            this.fbAuth.login(() => {
+                resolve();
+            }, params);
+        }).catch(err => { throw err });
+        return wraper;
     }
 
 }
