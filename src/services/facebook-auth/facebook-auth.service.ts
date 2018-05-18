@@ -40,20 +40,9 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         if (this.environment.isDev()) {
             return await this._signInToServer(params);
         }
-        const res: FBAuthResponse = await this.fbLogin({ scope: 'public_profile,email' });
-        console.log(res);
-        if (res != undefined && res.status === 'connected') {
-
-            const { authResponse } = res
-            console.log(res);
-            // sign in the user using server.
-            return await this._signInToServer({ token: authResponse.accessToken });
-        } else {
-            console.log('The person is not logged into this app or we are unable to tell.')
-        }
-        /*
+        // const res: FBAuthResponse = await this.fbLogin({ scope: 'public_profile,email' });
         await this.fbAuth.login(
-            async () => {
+            async (res) => {
 
                 console.log(res);
                 if (res != undefined && res.status === 'connected') {
@@ -66,7 +55,18 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
                     console.log('The person is not logged into this app or we are unable to tell.')
                 }
             }, { scope: 'public_profile,email' });
-            */
+        /*
+        console.log(res);
+        if (res != undefined && res.status === 'connected') {
+
+            const { authResponse } = res
+            console.log(res);
+            // sign in the user using server.
+            return await this._signInToServer({ token: authResponse.accessToken });
+        } else {
+            console.log('The person is not logged into this app or we are unable to tell.')
+        }
+        */
         return null;
     }
 

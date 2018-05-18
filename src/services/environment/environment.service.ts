@@ -12,6 +12,8 @@ export class EnvironmentService {
     constructor() {
         console.log(`${_env}`);
         this.env = Object.freeze(_env); // making env object to be imutiable
+        console.log(this.get('CUR_ENV'));
+        
     }
 
     get(keyName : string): string | undefined {

@@ -1,10 +1,11 @@
 
 import { Component, Inject } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Loading } from 'ionic-angular';
-import { Provider } from '../../models/provider.enum';
+
 import { AgentAuthService } from '../../services/agent-auth.service';
 import { EnvironmentService } from '../../services/environment/environment.service';
 
+import { Provider } from '../../models/provider.enum';
 
 @IonicPage()
 @Component({
@@ -47,7 +48,7 @@ export class AuthPage {
     try {
       this.agentAuthService.setStrategy(Provider.FACEBOOK_PROVIDER);
       if(this.environment.isDev()) {
-        const fakeBody = {token: "EAABuxssE9ZA4BAPgiHMh1ZBjGy68gSgITzarwEJ2cqLJZBKlU…VhpFCnBVzh04O1hGoh0yZCKYDBrRheWe6bgdXzhJYTmkgZDZD", userID: "251074535454201", expiresIn: 4316, signedRequest: "0DvQRC_Ty3evO4H_zvdN5SrZtwOpgMFL2LfeFrrItqk.eyJhbG…yNjU1NDA4NCwidXNlcl9pZCI6IjI1MTA3NDUzNTQ1NDIwMSJ9"};
+        const fakeBody = {token: "EAABuxssE9ZA4BANIprwvgTZCZB9YmPZCmdVh4sEGqhZBS1ikBckTpcZAwe4qk2oJvqIDWaTTgHnDxW5AI1mxYJZAvp2osouE1fz5ZCTUhc9NdLBbULr31wx6xffZALzGNEsQJAABiaSOlEAFhnpZAWfrYEzNUX9OJn3ZBffXaXbbTE5GWe3Vh6Ju7WdiCTOA1xblLiLIjgaqRjktgZDZD"};
         const res =  this.agentAuthService.onSignIn(fakeBody);
         console.log(res);
       } else {
