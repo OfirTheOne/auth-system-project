@@ -44,7 +44,7 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         await this.fbAuth.login(
             async (res) => {
 
-                console.log(res);
+                console.log(res); 
                 if (res != undefined && res.status === 'connected') {
                     
                     const {authResponse} = res
