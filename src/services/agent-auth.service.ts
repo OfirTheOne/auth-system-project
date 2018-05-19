@@ -15,7 +15,7 @@ import { Provider } from './../models/provider.enum';
 @Injectable()
 export class AgentAuthService {
 
-    // oobject that manage the declared provider in the local storage
+    // object that manage the declared provider in the local storage
     private pdm: ProviderDeclaretionManeger = new ProviderDeclaretionManeger();
 
     // class member, contains the current authStrategy strategy according to what the user chooses.
@@ -35,11 +35,8 @@ export class AgentAuthService {
         private google: GAS, // auth strategy 02
         private facebook: FAS, // auth strategy 03
     ) {
-
-        this.setStrategyByDeclaredProvider();
         this.waitForAllResInit();
-
-
+        this.setStrategyByDeclaredProvider();
     }
 
     /************ public methods ************/
@@ -128,18 +125,9 @@ export class AgentAuthService {
 
     private chackIsAuthResInit(g: boolean, f: boolean, c: boolean): void {
         if (g && f && c) {
-            this.isUserSignInOnLoad();
             this.isAuthResInit = true;
             this.authResInitEvent.next();
         }
-    }
-
-    private isUserSignInOnLoad() {
-        this.authStrategy = [this.google, this.facebook, this.custom]
-            .find((auth) => {
-                const res = auth.isSignIn();
-                return res;
-            });
     }
 
     private cleanAllSignInProviders() {
@@ -159,7 +147,9 @@ export class AgentAuthService {
     private setStrategyByDeclaredProvider() {
         const strategyArray = this.getAuthStrategyArray();
         this.authStrategy = strategyArray.find((strategy) => {
-            return strategy.getProviderName() == this.pdm.getDeclaredProvider();
+            let dp = this.pdm.getDeclaredProvider();
+            let pn = strategy.getProviderName();
+            return pn == dp;
         });
     }
 

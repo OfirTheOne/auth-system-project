@@ -64,6 +64,7 @@ export abstract class AuthStrategyService {
         }
     }
 
+    // public authResInitEventSubscribe(callback: () => void): Subscription;
 
     /************************ protected ************************/
     protected abstract authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean;
