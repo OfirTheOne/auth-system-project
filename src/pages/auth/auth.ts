@@ -49,10 +49,10 @@ export class AuthPage {
       this.agentAuthService.setStrategy(Provider.FACEBOOK_PROVIDER);
       if(this.environment.isDev()) {
         const fakeBody = {token: "EAABuxssE9ZA4BANIprwvgTZCZB9YmPZCmdVh4sEGqhZBS1ikBckTpcZAwe4qk2oJvqIDWaTTgHnDxW5AI1mxYJZAvp2osouE1fz5ZCTUhc9NdLBbULr31wx6xffZALzGNEsQJAABiaSOlEAFhnpZAWfrYEzNUX9OJn3ZBffXaXbbTE5GWe3Vh6Ju7WdiCTOA1xblLiLIjgaqRjktgZDZD"};
-        const res =  this.agentAuthService.onSignIn(fakeBody);
+        const res = await this.agentAuthService.onSignIn(fakeBody);
         console.log(res);
       } else {
-        const res =  this.agentAuthService.onSignIn();
+        const res = await this.agentAuthService.onSignIn();
         console.log(res);
       }
   

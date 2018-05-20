@@ -31,7 +31,7 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         }
     }
 
-    public async onSignIn(params = undefined): Promise<AuthResponse> {
+    public async onSignIn(params = undefined): Promise<UserDataBase> {
         /**
          * doc : 
          *  https://developers.facebook.com/docs/reference/javascript/FB.login/v2.12

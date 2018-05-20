@@ -35,8 +35,8 @@ export class AgentAuthService {
         private google: GAS, // auth strategy 02
         private facebook: FAS, // auth strategy 03
     ) {
-        this.waitForAllResInit();
         this.setStrategyByDeclaredProvider();
+        this.waitForAllResInit();
     }
 
     /************ public methods ************/
@@ -67,7 +67,7 @@ export class AgentAuthService {
         if (this.authStrategy == undefined) {
             return false;
         } else {
-            return this.authStrategy.isSignIn();
+            return this.authStrategy.isSignIn() && this.authStrategy.getProfile() != undefined;
         }
     }
 
@@ -123,20 +123,12 @@ export class AgentAuthService {
 
     /************ private methods ************/
 
-    private chackIsAuthResInit(g: boolean, f: boolean, c: boolean): void {
+    private async chackIsAuthResInit(g: boolean, f: boolean, c: boolean) {
         if (g && f && c) {
+            await this.getUserDataOnInit();
             this.isAuthResInit = true;
             this.authResInitEvent.next();
         }
-    }
-
-    private cleanAllSignInProviders() {
-        const authProviders = this.getAuthStrategyArray();
-        authProviders.forEach(async (auth) => {
-            if (auth.isSignIn()) {
-                await auth.onSignOut();
-            }
-        })
     }
 
     private getAuthStrategyArray(): AuthStrategyService[] {
@@ -158,14 +150,20 @@ export class AgentAuthService {
         let g_init = false;
         let f_init = true;
 
-        this.google.authResInitEventSubscribe(() => {
+        this.google.authResInitEventSubscribe(async () => {
             g_init = true;
-            this.chackIsAuthResInit(g_init, f_init, true);
+            await this.chackIsAuthResInit(g_init, f_init, true);
         });
-        this.facebook.authResInitEventSubscribe(() => {
+        this.facebook.authResInitEventSubscribe(async () => {
             f_init = true;
-            this.chackIsAuthResInit(g_init, f_init, true);
+            await this.chackIsAuthResInit(g_init, f_init, true);
         });
+    }
+
+    private async getUserDataOnInit() {
+        if(this.authStrategy.isSignIn()) {
+            return await this.authStrategy.getCachedUserData();
+        }
     }
 
 }

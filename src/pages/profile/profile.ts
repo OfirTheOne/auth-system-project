@@ -29,7 +29,7 @@ export class ProfilePage {
     return this.agentAuth.isSignIn();
   }
 
-  getProfile(): UserDataBase {
+  getProfile() {
     if(this.agentAuth.isSignIn()) {
       return this.agentAuth.getProfile();
     }

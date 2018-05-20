@@ -4,7 +4,7 @@ export interface UserDataBase {
     userName: string, 
     email: string,
     provider: Provider,
-    personalData: {
+    personalData?: {
         firstName: string, 
         lastName: string, 
         gender: string, 

@@ -17,7 +17,7 @@ export class CustomAuthStrategyService extends AuthStrategyService {
         super(Provider.CUSTOM_PROVIDER, 'custom', userApi);
     }
 
-    public async onSignIn(params?: {email, password }): Promise<AuthResponse> {
+    public async onSignIn(params?: {email, password }): Promise<UserDataBase> {
         console.log(`CAS.getAuthHeader(${params})`);
 
         let res;
@@ -27,7 +27,7 @@ export class CustomAuthStrategyService extends AuthStrategyService {
             console.log(res, res.body.data.tokenData);
             this.setSession(res.body.data.tokenData);
             this.udb = res.body.data.user; 
-            return res.body.data;
+            return res.body.data.user;
         } catch (e) {
             console.log(e);
             throw e;

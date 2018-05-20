@@ -42,7 +42,7 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
         this.googleAuthInit();
     }
 
-    public async onSignIn(): Promise<AuthResponse> {
+    public async onSignIn(): Promise<UserDataBase> {
         console.log(`GAS.onSignIn()`);
         // auth2 is init 
         if (this.isAuth2Init) {
@@ -81,7 +81,7 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
         console.log(`GAS.isSignIn()`);
 
         if (this.isAuth2Init) {
-            return (this.auth2.isSignedIn.get() && this.udb != undefined);
+            return (this.auth2.isSignedIn.get() /* && this.udb != undefined */);
         } else {
             return false;
         }

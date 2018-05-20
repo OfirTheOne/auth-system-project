@@ -27,7 +27,7 @@ export abstract class AuthStrategyService {
 
 
     /************************ public ************************/
-    public abstract onSignIn(params?): Promise<AuthResponse>;
+    public abstract onSignIn(params?): Promise<UserDataBase>;
 
     public abstract onSignOut(): any;
 
@@ -35,12 +35,18 @@ export abstract class AuthStrategyService {
 
     public abstract getAuthHeader(): HttpHeaders;
 
-    public getProfile(): UserDataBase | undefined {
-        if (this.isSignIn()) {
-            return this.udb;
-        } else {
-            console.log('the user is\'nt sign in');
+    public async getCachedUserData(refreshed? : boolean): Promise<UserDataBase> {
+
+        if(this.udb == undefined || refreshed) {
+            const headers = this.getAuthHeader(); 
+            const authRes = await this.userApi.getUserData(headers);
+            this.udb = authRes.user;
         }
+        return this.udb;
+    }
+
+    public getProfile(): UserDataBase {
+            return this.udb;
     }
 
     public getProvider(): Provider {
@@ -98,7 +104,7 @@ export abstract class AuthStrategyService {
 
     */
 
-    protected async _signInToServer(signInParams: { token?: string, data?: { email, password } }): Promise<AuthResponse> {
+    protected async _signInToServer(signInParams: { token?: string, data?: { email, password } }): Promise<UserDataBase> {
         console.log(`_signInToServer : `,signInParams);
         let serverRes;
         if (signInParams && 'token' in signInParams) {
@@ -115,7 +121,7 @@ export abstract class AuthStrategyService {
         console.log(authResponse);
         // saving the signed user data in the service.
         this.udb = serverRes.body.data.user;
-        return serverRes.body.data;
+        return serverRes.body.data.user;
     }
     protected async _signOutFromServer(headers: HttpHeaders) {
         return await this.userApi.deleteUserCurToken(headers);
