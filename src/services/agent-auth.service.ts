@@ -105,7 +105,7 @@ export class AgentAuthService {
         return this.authStrategy ? this.authStrategy.getProvider() : undefined;
     }
 
-    
+
     // signIn events related
 
     public getIsAuthResInit(): boolean {
@@ -123,28 +123,6 @@ export class AgentAuthService {
 
     /************ private methods ************/
 
-    private async chackIsAuthResInit(g: boolean, f: boolean, c: boolean) {
-        if (g && f && c) {
-            await this.getUserDataOnInit();
-            this.isAuthResInit = true;
-            this.authResInitEvent.next();
-        }
-    }
-
-    private getAuthStrategyArray(): AuthStrategyService[] {
-        return [this.custom, this.google, this.facebook];
-    }
-
-    /* used once in the c'tor */
-    private setStrategyByDeclaredProvider() {
-        const strategyArray = this.getAuthStrategyArray();
-        this.authStrategy = strategyArray.find((strategy) => {
-            let dp = this.pdm.getDeclaredProvider();
-            let pn = strategy.getProviderName();
-            return pn == dp;
-        });
-    }
-
     /* used once in the c'tor */
     private waitForAllResInit() {
         let g_init = false;
@@ -160,8 +138,40 @@ export class AgentAuthService {
         });
     }
 
+    /** @description
+     * when google & facebook lib resources are loaded 'g', 'f' and 'c' will be true,
+     * and that will triger 'authResInitEvent' event.
+     */
+    private async chackIsAuthResInit(g: boolean, f: boolean, c: boolean) {
+        if (g && f && c) {
+            this.pdm.isDeclared() ?
+                await this.getUserDataOnInit() : null;
+            this.isAuthResInit = true;
+            this.authResInitEvent.next();
+        }
+    }
+
+    /* used once in the c'tor */
+    private setStrategyByDeclaredProvider() {
+        const strategyArray = this.getAuthStrategyArray();
+        this.authStrategy = strategyArray.find((strategy) => {
+            let dp = this.pdm.getDeclaredProvider();
+            let pn = strategy.getProviderName();
+            return pn == dp;
+        });
+    }
+
+    private getAuthStrategyArray(): AuthStrategyService[] {
+        return [this.custom, this.google, this.facebook];
+    }
+
+    /** 
+     * @description 
+     * if 'authStrategy' defined and authStrategy.isSigned() return true, this method will call authStrategy.getCachedUserData() 
+     * and return the resulte.
+     */
     private async getUserDataOnInit() {
-        if(this.authStrategy.isSignIn()) {
+        if (this.authStrategy != undefined && this.authStrategy.isSignIn()) {
             return await this.authStrategy.getCachedUserData();
         }
     }
@@ -183,7 +193,7 @@ class ProviderDeclaretionManeger {
         return localStorage.getItem(this.keyName) != undefined;
     }
 
-    public getDeclaredProvider() : string {
+    public getDeclaredProvider(): string {
         return localStorage.getItem(this.keyName);
     }
 }
