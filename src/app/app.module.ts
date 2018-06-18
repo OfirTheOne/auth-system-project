@@ -45,8 +45,8 @@ import { EnvironmentService } from '../services/environment/environment.service'
     MyApp,
     AuthPage,
     ProfilePage,
+    ProfileFormPage,
     TabsPage,
-    ProfileFormPage
   ],
   providers: [
     StatusBar,
