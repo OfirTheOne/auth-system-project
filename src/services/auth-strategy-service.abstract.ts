@@ -15,7 +15,7 @@ import { ServerResponse } from '../models/custom-auth-models/server-response.int
 
 export abstract class AuthStrategyService {
 
-    protected udb: UserDataBase;
+    protected userDbProfile: UserDataBase;
     // private class member :  provider 
     // private class member :  providerName 
     // private class member :  userApi  
@@ -27,6 +27,7 @@ export abstract class AuthStrategyService {
 
 
     /************************ public ************************/
+
     public abstract onSignIn(params?): Promise<UserDataBase>;
 
     public abstract onSignOut(): any;
@@ -35,18 +36,44 @@ export abstract class AuthStrategyService {
 
     public abstract getAuthHeader(): HttpHeaders;
 
-    public async getCachedUserData(refreshed? : boolean): Promise<UserDataBase> {
+    public abstract getToken(): string;
 
-        if(this.udb == undefined || refreshed) {
-            const headers = this.getAuthHeader(); 
-            const authRes = await this.userApi.getUserData(headers);
-            this.udb = authRes.user;
+    /**
+     * signData contains the provider and token that stored on the local storage, 
+     * if it defined it will be used as a auth header for the 'getUserData' method. if it undefined, 
+     * the method 'getUserData' will recieve this.getAuthHeader() as auth header (assuming the user siged in).
+     */
+    public async getUserData(signData?: {token: string, providerName: string}): Promise<UserDataBase> {            let headers;
+        if(signData) { // first priority to signData. if it defined it will be set to the authHeader.
+            headers = this._buildAuthHeader(signData);  // 
+        } else if(this.isSignIn()) {
+            headers = this.getAuthHeader(); 
         }
-        return this.udb;
+        const authRes = await this.userApi.getUserData(headers);
+        this.userDbProfile = authRes.user;
+        
+        return this.userDbProfile;
     }
 
-    public getProfile(): UserDataBase {
-            return this.udb;
+    /**
+     * 
+     * @param newToken token recieved by the external plugin
+     * @param oldToken token stored in the L.S
+     */
+    public async renewCurToken(newToken: string, oldToken: string) {
+        if(this.isSignIn()) {
+
+            const headers = this._buildAuthHeader({
+                providerName: this.getProviderName(), 
+                token : oldToken
+            });
+            
+            return await this.userApi.postRenewToken(headers, {newToken});    
+        }
+    }
+
+    public getProfile(): UserDataBase | undefined {
+            return this.userDbProfile;
     }
 
     public getProvider(): Provider {
@@ -70,61 +97,44 @@ export abstract class AuthStrategyService {
         }
     }
 
-    // public authResInitEventSubscribe(callback: () => void): Subscription;
+    // mybe add this method --> public authResInitEventSubscribe(callback: () => void): Subscription;
 
     /************************ protected ************************/
+    
     protected abstract authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean;
 
-    protected _buildAuthHeader(token: string): HttpHeaders {
-        return new HttpHeaders({ 'x-auth': token, 'x-provider': this.providerName });
+    protected _buildAuthHeader(headersData: {token: string, providerName: string}): HttpHeaders {
+        return new HttpHeaders({ 'x-auth': headersData.token, 'x-provider': headersData.providerName });
     }
 
-    /*
-    protected async _signInToServer(signInParams: { data: { email, password } }): Promise<AuthResponse>; // custom auth 
-    protected async _signInToServer(signInParams: { token: string }): Promise<AuthResponse>; // google & facebook auth
-    protected async _signInToServer(signInParams: { token: string } | { data: { email, password } }): Promise<AuthResponse> {
+    protected async _signInToServer(signInParams: { token?: string,  data?: { email, password } }): Promise<UserDataBase> {
         console.log(`_signInToServer : `,signInParams);
         let serverRes;
+
+        // sign in the user using third party services, e.g google, facebook.
         if (signInParams && 'token' in signInParams) {
-            // sign in the user using third party services, e.g google, facebook.
+            
             serverRes = await this.userApi.postSignInUser(this.provider, 
                 { idToken: signInParams.token });
+
+        // sign in the user using custom server
         } else if (signInParams && 'data' in signInParams) {
-            // sign in the user using custom server
+            
             serverRes = await this.userApi.postSignInUser(this.provider,
                 { email: signInParams.data.email, password: signInParams.data.password });
         }
-        // authenticate the server response. / validating the returned user id.
+        // authenticate the server response. / validating the returned user id. 
+        // TODO : throw ex if 'authResponse' is false
         const authResponse = this.authenticateServerResponse(serverRes.body);
         console.log(authResponse);
         // saving the signed user data in the service.
-        this.udb = serverRes.body.data.user;
-        return serverRes.body.data;
-    }
-
-    */
-
-    protected async _signInToServer(signInParams: { token?: string, data?: { email, password } }): Promise<UserDataBase> {
-        console.log(`_signInToServer : `,signInParams);
-        let serverRes;
-        if (signInParams && 'token' in signInParams) {
-            // sign in the user using third party services, e.g google, facebook.
-            serverRes = await this.userApi.postSignInUser(this.provider, 
-                { idToken: signInParams.token });
-        } else if (signInParams && 'data' in signInParams) {
-            // sign in the user using custom server
-            serverRes = await this.userApi.postSignInUser(this.provider,
-                { email: signInParams.data.email, password: signInParams.data.password });
-        }
-        // authenticate the server response. / validating the returned user id.
-        const authResponse = this.authenticateServerResponse(serverRes.body);
-        console.log(authResponse);
-        // saving the signed user data in the service.
-        this.udb = serverRes.body.data.user;
+        this.userDbProfile = serverRes.body.data.user;
         return serverRes.body.data.user;
     }
+
     protected async _signOutFromServer(headers: HttpHeaders) {
         return await this.userApi.deleteUserCurToken(headers);
     }
 
+    
 }

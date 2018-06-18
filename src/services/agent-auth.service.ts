@@ -1,4 +1,3 @@
-import { stagger } from '\@angular/animations';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
@@ -16,19 +15,21 @@ import { Provider } from './../models/provider.enum';
 export class AgentAuthService {
 
     // object that manage the declared provider in the local storage
-    private pdm: ProviderDeclaretionManeger = new ProviderDeclaretionManeger();
+    private sdm: SignDeclaretionManeger = new SignDeclaretionManeger();
 
     // class member, contains the current authStrategy strategy according to what the user chooses.
     private authStrategy: AuthStrategyService;
 
     // event, dispatch when all auth related resources are loaded,
-    // when google and facebook plugin is loaded.  
-    private authResInitEvent: Subject<void> = new Subject();
+    // dispatch when google and facebook plugin is loaded.  
+    private authResourcesInitEvent: Subject<void> = new Subject();
 
     private userStatusChangeEvent: Subject<void> = new Subject();
 
     // flag, set to true when all auth related resources are loaded.
     private isAuthResInit: boolean = false;
+
+    private renewTokenRequestBeenSend = false;
 
     constructor(
         private custom: CAS, // auth strategy 01
@@ -39,89 +40,118 @@ export class AgentAuthService {
         this.waitForAllResInit();
     }
 
-    /************ public methods ************/
+    /************************ public ************************/
 
-    public async onSignIn(params?) {
+    // sign in action.
+    public async onSignIn(provider: Provider , params?) {
+        this.setStrategy(provider);
         if (this.authStrategy == undefined) {
             throw new Error('Auth service is not initialized');
         } else {
             const res = await this.authStrategy.onSignIn(params);
-            this.pdm.declareProvider(this.authStrategy.getProviderName());
+            this.sdm.declareSignData({   
+                providerName: this.authStrategy.getProviderName(), 
+                token: this.authStrategy.getToken() 
+            });
             this.userStatusChangeEvent.next();
             return res;
         }
     }
 
+    // sign out action.
     public async onSignOut() {
         if (this.authStrategy == undefined) {
             throw new Error('Auth service is not initialized');
         } else {
+            this.sdm.undeclareSignData();
+            this.renewTokenRequestBeenSend = false;
             const res = await this.authStrategy.onSignOut();
-            this.pdm.undeclareProvider();
             this.userStatusChangeEvent.next();
             return res;
         }
     }
 
+    // inform is the user authenticate and in the system.
+    /**
+     *  the user is formally signed in the app if :
+     *  - the authServise signIn returned true.
+     *  - the userDataBase object is init ( this.authStrategy.getProfile() is defined).
+     *  - the authServise token and the sdm token are the same.
+     */
     public isSignIn(): boolean {
+        let signStatus;
         if (this.authStrategy == undefined) {
-            return false;
+            signStatus = false;
         } else {
-            return this.authStrategy.isSignIn() && this.authStrategy.getProfile() != undefined;
+            signStatus = this.authStrategy.isSignIn() && this.authStrategy.getProfile() != undefined;
+            if(signStatus) {
+                const oldToken = this.sdm.getDeclaredSignData().token;
+                const newToken = this.authStrategy.getToken();
+                let isTokenUpToDate = (newToken == oldToken);
+
+                if(!isTokenUpToDate && !this.renewTokenRequestBeenSend) {
+                    // set renewTokenRequestBeenSend to true so the request will not repeat it self ,
+                    // this method is repeatedly being called.
+                    this.renewTokenRequestBeenSend = true; 
+
+                    // important - using then / catch so the method will stay sync .
+                    this.authStrategy.renewCurToken(newToken, oldToken)
+                        .then((d) => {
+                            this.sdm.declareSignData({
+                                token: newToken,
+                                providerName: this.authStrategy.getProviderName()
+                            });
+                            console.log('renew token request success.', d);
+                        })
+                        .catch((e) => {console.log('renew token request failed.', e);});
+                }
+
+                signStatus = signStatus && isTokenUpToDate;
+            }
         }
+        return signStatus;
     }
 
-    public async onUpdateUserData(userData) {
+    // update the signed in user data to the db.
+    public async onUpdateUserData(userData: 
+        { firstName: string, lastName: string, gender: string, age: number }) {
         try {
-            await this.authStrategy.onUpdateUserData(userData);
+            if(this.isSignIn()) {
+                await this.authStrategy.onUpdateUserData(userData);
+            }
         } catch (e) {
             console.log(e);
         }
     }
 
-    public setStrategy(authProvider: Provider): void {
-        switch (authProvider) {
-            case Provider.CUSTOM_PROVIDER:
-                this.authStrategy = this.custom;
-                break;
-            case Provider.GOOGLE_PROVIDER:
-                this.authStrategy = this.google;
-                break;
-            case Provider.FACEBOOK_PROVIDER:
-                this.authStrategy = this.facebook;
-                break;
-            default:
-                break;
-        }
-    }
-
+    // return the udb object in the current authStrategy object. undefined if the user not signed in.
     public getProfile(): undefined | UserDataBase {
-        if (this.authStrategy != undefined) {
-            return this.authStrategy.getProfile();
-        }
+        return this.authStrategy ? this.authStrategy.getProfile() : undefined;
     }
 
+    // return the current provider enum. undefined if the user not signed in.
     public getProvider(): undefined | Provider {
         return this.authStrategy ? this.authStrategy.getProvider() : undefined;
     }
 
-
-    // signIn events related
-
-    public getIsAuthResInit(): boolean {
-        return this.isAuthResInit;
-    }
-
-    public authResInitEventSubscribe(callback: () => void): Subscription {
-        return this.authResInitEvent.subscribe(callback);
-    }
-
+    // method used for subscribing to an event the will triger on eny sign user releted action.
     public userStatusChangeEventSubscribe(callback: () => void): Subscription {
         return this.userStatusChangeEvent.subscribe(callback);
     }
 
 
-    /************ private methods ************/
+    // * resources events related * //
+
+    public getIsAuthResInit(): boolean {
+        return this.isAuthResInit;
+    }
+
+    public authResourcesInitEventSubscribe(callback: () => void): Subscription {
+        return this.authResourcesInitEvent.subscribe(callback);
+    }
+
+
+    /************************ private ************************/
 
     /* used once in the c'tor */
     private waitForAllResInit() {
@@ -144,10 +174,39 @@ export class AgentAuthService {
      */
     private async chackIsAuthResInit(g: boolean, f: boolean, c: boolean) {
         if (g && f && c) {
-            this.pdm.isDeclared() ?
-                await this.getUserDataOnInit() : null;
+            try {
+                if(this.sdm.isDeclared()) {
+                    await this.getUserDataOnInit();
+
+                }
+            } catch(e) {
+                console.log(e);
+                // removing data from the L.S only if the request returned unauthorized error
+                if('status' in e && e.status == 401) {
+                    this.sdm.undeclareSignData();
+                }
+            }
             this.isAuthResInit = true;
-            this.authResInitEvent.next();
+            this.authResourcesInitEvent.next();
+        }
+    }
+
+    /** @description
+     * setting the auth strategy by a given provider, set before any signIn action.
+     */
+    private setStrategy(authProvider: Provider): void {
+        switch (authProvider) {
+            case Provider.CUSTOM_PROVIDER:
+                this.authStrategy = this.custom;
+                break;
+            case Provider.GOOGLE_PROVIDER:
+                this.authStrategy = this.google;
+                break;
+            case Provider.FACEBOOK_PROVIDER:
+                this.authStrategy = this.facebook;
+                break;
+            default:
+                break;
         }
     }
 
@@ -155,9 +214,9 @@ export class AgentAuthService {
     private setStrategyByDeclaredProvider() {
         const strategyArray = this.getAuthStrategyArray();
         this.authStrategy = strategyArray.find((strategy) => {
-            let dp = this.pdm.getDeclaredProvider();
-            let pn = strategy.getProviderName();
-            return pn == dp;
+            let signData = this.sdm.getDeclaredSignData();
+            let providerName = strategy.getProviderName();
+            return providerName == signData.providerName;
         });
     }
 
@@ -167,33 +226,55 @@ export class AgentAuthService {
 
     /** 
      * @description 
-     * if 'authStrategy' defined and authStrategy.isSigned() return true, this method will call authStrategy.getCachedUserData() 
+     * if 'authStrategy' defined, this method will call authStrategy.getCachedUserData() 
      * and return the resulte.
      */
     private async getUserDataOnInit() {
-        if (this.authStrategy != undefined && this.authStrategy.isSignIn()) {
-            return await this.authStrategy.getCachedUserData();
+        if (this.authStrategy != undefined) {
+            const signData = this.sdm.getDeclaredSignData();
+            return await this.authStrategy.getUserData(signData);
+        }
+    }
+
+    private async renewCurToken() {
+        if (this.authStrategy != undefined) {
+            const oldToken = this.sdm.getDeclaredSignData().token;
+            const newToken = this.authStrategy.getToken();
+            await this.authStrategy.renewCurToken(newToken, oldToken);
         }
     }
 
 }
 
-class ProviderDeclaretionManeger {
-    private readonly keyName = 'sign_p';
 
-    public declareProvider(providerName: string): void {
-        localStorage.setItem(this.keyName, providerName)
+/** @description
+ *  On every sign in event the Auth System will store in the local-storage an object 
+ *  with the fileds 'sign_p' (provider) and 'sign_t' (token), we refer to that object as 'signData'.
+ *  The class that in charge on all related actions is 'SignDeclaretionManeger'.
+ */
+class SignDeclaretionManeger {
+    private readonly providerKeyName = 'sign_p';
+    private readonly tokenKeyName = 'sign_t';
+
+    public declareSignData(signData: {providerName: string, token: string}): void {
+        localStorage.setItem(this.providerKeyName, signData.providerName);
+        localStorage.setItem(this.tokenKeyName, signData.token);
+        
     }
-
-    public undeclareProvider(): void {
-        localStorage.removeItem(this.keyName);
+ 
+    public undeclareSignData(): void {
+        localStorage.removeItem(this.providerKeyName);
+        localStorage.removeItem(this.tokenKeyName);
     }
 
     public isDeclared(): boolean {
-        return localStorage.getItem(this.keyName) != undefined;
+        return localStorage.getItem(this.providerKeyName) != undefined;
     }
 
-    public getDeclaredProvider(): string {
-        return localStorage.getItem(this.keyName);
+    public getDeclaredSignData(): {providerName: string, token: string} {
+        return {
+            providerName: localStorage.getItem(this.providerKeyName), 
+            token: localStorage.getItem(this.tokenKeyName)
+        };
     }
 }

@@ -1,15 +1,9 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { AgentAuthService } from '../../services/agent-auth.service';
 import { UserDataBase } from '../../models/user-data-base.interface';
 import { Provider } from '../../models/provider.enum';
-
-/**
- * Generated class for the ProfilePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import { ProfileFormPage } from '../profile-form/profile-form';
 
 @IonicPage()
 @Component({
@@ -18,7 +12,11 @@ import { Provider } from '../../models/provider.enum';
 })
 export class ProfilePage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private agentAuth: AgentAuthService) {
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams, 
+    private modalCtrl: ModalController,
+    private agentAuth: AgentAuthService) {
   }
 
   ionViewDidLoad() {
@@ -42,5 +40,14 @@ export class ProfilePage {
     } else {
       return -1;
     }
+  }
+
+  presentProfileModal() {
+    let profileFormModal = this.modalCtrl.create(ProfileFormPage);
+    profileFormModal.present();
+    profileFormModal.onDidDismiss(async (data) => {
+      console.log(data);
+      await this.agentAuth.onUpdateUserData(data);
+    });
   }
 }

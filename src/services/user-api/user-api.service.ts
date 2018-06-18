@@ -14,6 +14,8 @@ export class UserApiService {
 
     constructor(private environment: EnvironmentService, private httpClient: HttpClient) { }
 
+    /************************ public ************************/
+
     public async postSignInUser(provider: Provider, requestBody: { email: string, password: string } | { idToken: string })
         : Promise<HttpResponse<ServerResponse<AuthResponse>>> {
         console.log(`postSignUpUser(${provider}, ${requestBody})`);
@@ -30,6 +32,7 @@ export class UserApiService {
         }
     }
 
+    // TODO : delete return undefined need to change  
     // had a problom parsing the body of the request as a json , so
     // removing. in the option of the request, the observe, and adding responseType: 'text' fix it.
     public async deleteUserCurToken(headers: HttpHeaders)
@@ -61,6 +64,7 @@ export class UserApiService {
         }
     }
 
+
     public async postUserData(headers: HttpHeaders, requestBody: { data: { firstName?, lastName?, birthDate?, gender?} }) {
         console.log(`postUserData(${headers}, ${requestBody})`);
         const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'data/';
@@ -73,6 +77,22 @@ export class UserApiService {
             throw e;
         }
     }
+
+    public async postRenewToken(headers: HttpHeaders, requestBody: { newToken: string }) {
+        console.log(`postRenewToken(${headers}, ${requestBody})`);
+        const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'me/token/';
+        try {
+            const res = await this.httpClient.post(queryUrl, requestBody,
+                { headers, responseType: 'text' }).toPromise();
+            console.log(res);
+            return res;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+
+    /************************ private ************************/
 
     private getRouteByProvider(provider: Provider): String {
         switch (provider) {

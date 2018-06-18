@@ -26,7 +26,7 @@ export class CustomAuthStrategyService extends AuthStrategyService {
             // userApi.postSignInUser(Provider.CUSTOM_PROVIDER, params.data);
             console.log(res, res.body.data.tokenData);
             this.setSession(res.body.data.tokenData);
-            this.udb = res.body.data.user; 
+            this.userDbProfile = res.body.data.user; 
             return res.body.data.user;
         } catch (e) {
             console.log(e);
@@ -55,18 +55,18 @@ export class CustomAuthStrategyService extends AuthStrategyService {
     }
 
     public isSignIn(): boolean {
-        console.log(`CAS.isSignIn()`);
+        //console.log(`CAS.isSignIn()`);
         const tokenStatus = moment().isBefore(this.getExpiration());
         if (!tokenStatus) {
             this.removeTokenFromLocal();
         }
-        return tokenStatus && this.udb != undefined;
+        return tokenStatus && this.userDbProfile != undefined;
     }
 
     public getAuthHeader(): HttpHeaders {
         console.log(`CAS.getAuthHeader()`);
 
-        return this._buildAuthHeader(this.getToken());
+        return this._buildAuthHeader({token: this.getToken(), providerName: this.getProviderName() });
     }
     
     protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
@@ -82,7 +82,7 @@ export class CustomAuthStrategyService extends AuthStrategyService {
     // ************************************************************************ //
 
     
-    private getToken() {
+    public getToken(): string {
         return localStorage.getItem('token');
     }
 

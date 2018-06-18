@@ -27,9 +27,12 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
     constructor(private environment: EnvironmentService, userApi: UserApiService) {
         super(Provider.FACEBOOK_PROVIDER, 'facebook', userApi);
         if (this.environment.isProd()) {
-            this.facebookAuthInit();
+            this.facebookAuthResourceInit();
         }
     }
+
+
+    /************************ public ************************/
 
     public async onSignIn(params = undefined): Promise<UserDataBase> {
         /**
@@ -40,8 +43,8 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         if (this.environment.isDev()) {
             return await this._signInToServer(params);
         }
-        // const res: FBAuthResponse = await this.fbLogin({ scope: 'public_profile,email' });
-        await this.fbAuth.login(
+        // this.fbAuth.login work only with callback.
+        return await this.fbAuth.login(
             async (res) => {
 
                 console.log(res); 
@@ -55,19 +58,6 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
                     console.log('The person is not logged into this app or we are unable to tell.')
                 }
             }, { scope: 'public_profile,email' });
-        /*
-        console.log(res);
-        if (res != undefined && res.status === 'connected') {
-
-            const { authResponse } = res
-            console.log(res);
-            // sign in the user using server.
-            return await this._signInToServer({ token: authResponse.accessToken });
-        } else {
-            console.log('The person is not logged into this app or we are unable to tell.')
-        }
-        */
-        return null;
     }
 
     public async onSignOut() {
@@ -77,7 +67,7 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
          */
         const headers = this.getAuthHeader();
         const res = await this.fbAuth.logout();
-        this.udb = undefined;
+        this.userDbProfile = undefined;
         await this._signOutFromServer(headers);
         console.log(res);
     }
@@ -102,27 +92,8 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         const authRes = this.fbAuth.getAuthResponse();
         console.log(authRes);
         const token = authRes.accessToken;
-        return this._buildAuthHeader(token);
+        return this._buildAuthHeader({token, providerName: this.getProviderName()});
     }
-
-
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
-
-
-    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
-        const { authValue } = res.data;
-        console.log(authValue);
-        const authRes = this.fbAuth.getAuthResponse();
-        console.log(authRes);
-        const authuid = authRes.userID;
-        return authValue === authuid;
-    }
-
 
     /** @description subscribe to auth resource done initializing event. 
      * @param {function=} callback Optional callback.
@@ -139,7 +110,27 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         return this.isfbAuthInit;
     }
 
-    private facebookAuthInit() {
+    public getToken(): string {
+        const authRes = this.fbAuth.getAuthResponse();
+        return authRes.accessToken;
+    }
+
+
+    /************************ protected ************************/
+
+    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
+        const { authValue } = res.data;
+        console.log(authValue);
+        const authRes = this.fbAuth.getAuthResponse();
+        console.log(authRes);
+        const authuid = authRes.userID;
+        return authValue === authuid;
+    }
+
+
+    /************************ private ************************/
+
+    private facebookAuthResourceInit() {
         /**
          * doc : 
          *  https://developers.facebook.com/docs/javascript/quickstart
@@ -153,16 +144,10 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
                 version: 'v2.12',
                 status: true
             });
-            this.fbAuth = window['FB'];
-            // 
+            this.fbAuth = window['FB']; 
             this.isfbAuthInit = true;
             this.fbAuthInitEvent.next();
 
-            /*
-            if (this.isSignIn()) {
-                this.setProfileData();
-            }
-            */
         };
 
         (function (d, s, id) {

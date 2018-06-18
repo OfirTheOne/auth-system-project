@@ -39,8 +39,11 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
 
     constructor(private environment: EnvironmentService, userApi: UserApiService) {
         super(Provider.GOOGLE_PROVIDER, 'google', userApi);
-        this.googleAuthInit();
+        this.googleAuthResourceInit();
     }
+
+
+    /************************ public ************************/  
 
     public async onSignIn(): Promise<UserDataBase> {
         console.log(`GAS.onSignIn()`);
@@ -65,7 +68,7 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
             const headers = this.getAuthHeader();
             await this.auth2.signOut(); // this method do have no return value
             console.log('User signed out.');
-
+            this.userDbProfile = undefined;
             await this._signOutFromServer(headers);
 
         } else {
@@ -78,10 +81,10 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
      * if the auth2 object is not initialized it will return false.
      */
     public isSignIn(): boolean {
-        console.log(`GAS.isSignIn()`);
+       // console.log(`GAS.isSignIn()`);
 
         if (this.isAuth2Init) {
-            return (this.auth2.isSignedIn.get() /* && this.udb != undefined */);
+            return (this.auth2.isSignedIn.get() /* && this.userDbProfile != undefined */);
         } else {
             return false;
         }
@@ -91,75 +94,14 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
         console.log(`GAS.getAuthHeader()`);
 
         const token = this.getUserAuthData().id_token;
-        return this._buildAuthHeader(token);
+        return this._buildAuthHeader({token, providerName: this.getProviderName() });
     }
 
 
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
-    // ************************************************************************ //
 
 
-    private googleAuthInit() {
-        /**
-         * doc : 
-         *  https://developers.google.com/identity/protocols/OAuth2UserAgent#example
-         *  https://developers.google.com/identity/protocols/OAuth2UserAgent#creatingclient
-         */
-        // prevent duplicate code
-        let dispatchDelayedSignIn = false;
-        const setAuthRes = () => {
-            // listening to both client and auth2 objects.
-            window['gapi'].load('client:auth2', () => {
-                this.auth2 = window['gapi'].auth2.init({
-                    client_id: this.environment.get('GGL_CLIENT_ID'),
-                    fetch_basic_profile: true,
-                    scope: `profile ${EXTRA_SCOPES}`
-                });
-                window['gapi'].client.init({
-                    'apiKey': this.environment.get('GGL_API_KEY'),
-                    'clientId': this.environment.get('GGL_CLIENT_ID'),
-                    'scope': `https://www.googleapis.com/auth/drive.metadata.readonly  ${EXTRA_SCOPES}`,
-                    'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-                });
-
-                const authInstance = window['gapi'].auth2.getAuthInstance();
-                /*
-                authInstance.isSignedIn.listen(async (param) => {
-                    console.log('isSignedIn.listen');
-                    console.log(param);
-                    //dispatch the event delayedSignInOnLoadEvent only whan this service constructed
-                    if(!dispatchDelayedSignIn) {   
-                        this.delayedSignInOnLoadEvent.next();
-                        dispatchDelayedSignIn = true;
-                    }
-                        const tok = this.getUserAuthData().id_token;
-                        return this.signInToServer(tok);
-                    
-                });
-                */
-                this.isAuth2Init = true;
-                this.auth2InitEvent.next();
-            });
-        }
-
-        // if the plugin has been loaded
-        if (document.readyState === 'complete') {
-            setAuthRes();
-        } else {
-            // if the plugin has not been loaded, listening to load event of window
-            // and when it dispatched calling setAuth2()
-            try {
-                window.addEventListener('load', (e) => {
-                    setAuthRes();
-                });
-            } catch (ex) {
-                console.log(ex);
-            }
-        }
+    public getToken(): string {
+        return this.getUserAuthData().id_token;
     }
 
     /** @description subscribe to auth resource done initializing event. 
@@ -186,6 +128,63 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
         return this.isAuth2Init;
     }
 
+
+    /************************ protected ************************/  
+
+    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
+        const { authValue } = res.data;
+        const authuid = this.auth2.currentUser.get().getBasicProfile().getId();
+        return authValue === authuid;
+    }
+
+
+    /************************ private ************************/  
+
+    private googleAuthResourceInit() {
+        /**
+         * doc : 
+         *  https://developers.google.com/identity/protocols/OAuth2UserAgent#example
+         *  https://developers.google.com/identity/protocols/OAuth2UserAgent#creatingclient
+         */
+
+        const setAuthResource = () => {
+            // listening to both client and auth2 objects.
+            window['gapi'].load('client:auth2', () => {
+                this.auth2 = window['gapi'].auth2.init({
+                    client_id: this.environment.get('GGL_CLIENT_ID'),
+                    fetch_basic_profile: true,
+                    scope: `profile ${EXTRA_SCOPES}`
+                });
+                window['gapi'].client.init({
+                    'apiKey': this.environment.get('GGL_API_KEY'),
+                    'clientId': this.environment.get('GGL_CLIENT_ID'),
+                    'scope': `https://www.googleapis.com/auth/drive.metadata.readonly  ${EXTRA_SCOPES}`,
+                    'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+                });
+
+                const authInstance = window['gapi'].auth2.getAuthInstance();
+         
+                this.isAuth2Init = true;
+                this.auth2InitEvent.next();
+            });
+        }
+
+        // if the plugin has been loaded
+        if (document.readyState === 'complete') {
+            setAuthResource();
+        } else {
+            // if the plugin has not been loaded, listening to load event of window
+            // and when it dispatched calling setAuth2()
+            try {
+                window.addEventListener('load', (e) => {
+                    setAuthResource();
+                });
+            } catch (ex) {
+                console.log(ex);
+            }
+        }
+    }
+
     private getUserAuthData(): undefined | UserAuthData {
         // doc : https://developers.google.com/identity/sign-in/web/reference#googleauthcurrentuserget
         if (this.auth2.isSignedIn.get()) {
@@ -197,10 +196,5 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
         }
     }
 
-    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
-        const { authValue } = res.data;
-        const authuid = this.auth2.currentUser.get().getBasicProfile().getId();
-        return authValue === authuid;
-    }
 
 }

@@ -1,8 +1,10 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
+
 import { AuthPageModule } from './../pages/auth/auth.module';
 import { ProfilePageModule } from './../pages/profile/profile.module';
+import { ProfileFormPageModule } from '../pages/profile-form/profile-form.module';
 
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -12,6 +14,7 @@ import { MyApp } from './app.component';
 import { AuthPage } from '../pages/auth/auth';
 import { ProfilePage } from '../pages/profile/profile';
 import { TabsPage } from '../pages/tabs/tabs';
+import { ProfileFormPage } from '../pages/profile-form/profile-form';
 
 
 import { UserApiService } from '../services/user-api/user-api.service';
@@ -34,14 +37,16 @@ import { EnvironmentService } from '../services/environment/environment.service'
     HttpClientModule,
     IonicModule.forRoot(MyApp),
     AuthPageModule,
-    ProfilePageModule
+    ProfilePageModule,
+    ProfileFormPageModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
     AuthPage,
     ProfilePage,
-    TabsPage
+    TabsPage,
+    ProfileFormPage
   ],
   providers: [
     StatusBar,

@@ -22,7 +22,7 @@ export class AuthPage {
     private environment: EnvironmentService) {
       if (!this.agentAuthService.getIsAuthResInit()) {
         const loader = this.presentLoading('loading');
-        this.agentAuthService.authResInitEventSubscribe(() => {
+        this.agentAuthService.authResourcesInitEventSubscribe(() => {
           loader.dismiss();
         });
       }
@@ -32,12 +32,11 @@ export class AuthPage {
 
     console.log('ionViewDidLoad AuthPage');
   }
+  
 
   async gglSignIn() {
     try {
-
-      this.agentAuthService.setStrategy(Provider.GOOGLE_PROVIDER);
-     const res =  await this.agentAuthService.onSignIn();
+     const res =  await this.agentAuthService.onSignIn(Provider.GOOGLE_PROVIDER);
      console.log(res);
     } catch (ex) {
       console.log(ex);
@@ -46,26 +45,25 @@ export class AuthPage {
 
   async fbSignIn() {
     try {
-      this.agentAuthService.setStrategy(Provider.FACEBOOK_PROVIDER);
       if(this.environment.isDev()) {
         const fakeBody = {token: "EAABuxssE9ZA4BANIprwvgTZCZB9YmPZCmdVh4sEGqhZBS1ikBckTpcZAwe4qk2oJvqIDWaTTgHnDxW5AI1mxYJZAvp2osouE1fz5ZCTUhc9NdLBbULr31wx6xffZALzGNEsQJAABiaSOlEAFhnpZAWfrYEzNUX9OJn3ZBffXaXbbTE5GWe3Vh6Ju7WdiCTOA1xblLiLIjgaqRjktgZDZD"};
-        const res = await this.agentAuthService.onSignIn(fakeBody);
+        const res = await this.agentAuthService.onSignIn(Provider.FACEBOOK_PROVIDER, fakeBody);
         console.log(res);
       } else {
-        const res = await this.agentAuthService.onSignIn();
+        const res = await this.agentAuthService.onSignIn(Provider.FACEBOOK_PROVIDER);
         console.log(res);
       }
   
     
-  } catch (ex) {
-    console.log(ex);
-  }
+    } catch (ex) {
+      console.log(ex);
+    }
   }
 
   async ctSignIn() {
     try {
-      this.agentAuthService.setStrategy(Provider.CUSTOM_PROVIDER);
-      await this.agentAuthService.onSignIn();
+
+      await this.agentAuthService.onSignIn(Provider.CUSTOM_PROVIDER);
     } catch (ex) {
       console.log(ex);
     }
@@ -73,9 +71,9 @@ export class AuthPage {
 
   async ctSignUp() {
     try {
-      this.agentAuthService.setStrategy(Provider.CUSTOM_PROVIDER);
+      // this.agentAuthService.setStrategy(Provider.CUSTOM_PROVIDER);
       const params = {};
-      const res = await this.agentAuthService.onSignIn(params);
+      const res = await this.agentAuthService.onSignIn(Provider.CUSTOM_PROVIDER, params);
       console.log(res);
     } catch (ex) {
       console.log(ex);
