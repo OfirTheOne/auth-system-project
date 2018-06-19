@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { AgentAuthService } from '../../services/agent-auth.service';
-import { UserDataBase } from '../../models/user-data-base.interface';
-import { Provider } from '../../models/provider.enum';
 import { ProfileFormPage } from '../profile-form/profile-form';
 
 @IonicPage()

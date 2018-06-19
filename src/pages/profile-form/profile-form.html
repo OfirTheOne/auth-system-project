@@ -1,0 +1,68 @@
+<!--
+  Generated template for the ProfileFormPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>profile-form</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <form #f="ngForm" (ngSubmit)="submitData(f)">
+    <ion-grid>
+
+      <ion-row pedding-top>
+        <ion-col offset-2 col-8>
+          <ion-item>
+            <ion-label floating>First Name</ion-label>
+            <ion-input full type="text" name="firstName" ngModel required></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row pedding-top>
+        <ion-col offset-2 col-8>
+          <ion-item>
+            <ion-label floating>Last Name</ion-label>
+            <ion-input full type="text" name="lastName" ngModel required></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row pedding-top>
+          <ion-col offset-2 col-8>
+            <ion-item>
+              <ion-label floating>Gender</ion-label>
+              <ion-input full type="text" name="gender" ngModel required></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+
+        <ion-row pedding-top>
+            <ion-col offset-2 col-8>
+              <ion-item>
+                <ion-label floating>Birth Date</ion-label>
+                <ion-input full type="text" name="birthDate" ngModel required></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+
+      <ion-row>
+        <ion-col offset-2 col-8>
+          <button full ion-button color="dark" 
+                  [disabled]="!f.valid" type="submit">Submit</button>
+        </ion-col>
+      </ion-row>
+     
+    </ion-grid>
+  </form>
+
+
+</ion-content>
