@@ -3,8 +3,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AuthPageModule } from './../pages/auth/auth.module';
-import { ProfilePageModule } from './../pages/profile/profile.module';
 import { ProfileFormPageModule } from '../pages/profile-form/profile-form.module';
+import { ProfilePageModule } from './../pages/profile/profile.module';
 
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -37,15 +37,15 @@ import { EnvironmentService } from '../services/environment/environment.service'
     HttpClientModule,
     IonicModule.forRoot(MyApp),
     AuthPageModule,
-    ProfilePageModule,
-    ProfileFormPageModule
+    ProfileFormPageModule,
+    ProfilePageModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
     AuthPage,
-    ProfilePage,
     ProfileFormPage,
+    ProfilePage,
     TabsPage,
   ],
   providers: [
