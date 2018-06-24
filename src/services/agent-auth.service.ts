@@ -55,6 +55,9 @@ export class AgentAuthService {
                 providerName: this.authStrategy.getProviderName(), 
                 token: this.authStrategy.getToken() 
             });
+            console.log(`onSignIn authStrategy ${this.authStrategy.getToken()}`);
+            console.log(`onSignIn sdm ${this.sdm.getDeclaredSignData().token}`);
+
             this.userStatusChangeEvent.next();
             return res;
         }
