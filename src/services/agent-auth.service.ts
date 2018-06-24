@@ -10,6 +10,7 @@ import { UserApiService as UAS } from './user-api/user-api.service';
 
 import { UserDataBase } from './../models/user-data-base.interface';
 import { Provider } from './../models/provider.enum';
+import { EnvironmentService } from './environment/environment.service';
 
 @Injectable()
 export class AgentAuthService {
@@ -35,6 +36,7 @@ export class AgentAuthService {
         private custom: CAS, // auth strategy 01
         private google: GAS, // auth strategy 02
         private facebook: FAS, // auth strategy 03
+        private environment: EnvironmentService
     ) {
         this.setStrategyByDeclaredProvider();
         this.waitForAllResInit();
@@ -89,7 +91,10 @@ export class AgentAuthService {
             if(signStatus) {
                 const oldToken = this.sdm.getDeclaredSignData().token;
                 const newToken = this.authStrategy.getToken();
+                console.log(`newToken : ${newToken}`);
+                console.log(`oldToken : ${oldToken}`);
                 let isTokenUpToDate = (newToken == oldToken);
+                console.log(`isTokenUpToDate : ${isTokenUpToDate}`);
                 if(!isTokenUpToDate && !this.renewTokenRequestBeenSend) {
                     // set renewTokenRequestBeenSend to true so the request will not repeat it self ,
                     // this method is repeatedly being called.
@@ -158,7 +163,10 @@ export class AgentAuthService {
     /* used once in the c'tor */
     private waitForAllResInit() {
         let g_init = false;
-        let f_init = true;
+        let f_init = 
+            this.environment.isProd()? 
+                false : 
+                true;
 
         this.google.authResInitEventSubscribe(async () => {
             g_init = true;
