@@ -83,15 +83,17 @@ export class AgentAuthService {
         if (this.authStrategy == undefined) {
             signStatus = false;
         } else {
-            signStatus = this.authStrategy.isSignIn() && this.authStrategy.getProfile() != undefined;
+            signStatus = this.authStrategy.isSignIn() && (this.authStrategy.getProfile() != undefined);
+            console.log(`from isSignIn - ${JSON.stringify(this.authStrategy.getProfile())}`);
+            
             if(signStatus) {
                 const oldToken = this.sdm.getDeclaredSignData().token;
                 const newToken = this.authStrategy.getToken();
                 let isTokenUpToDate = (newToken == oldToken);
-
                 if(!isTokenUpToDate && !this.renewTokenRequestBeenSend) {
                     // set renewTokenRequestBeenSend to true so the request will not repeat it self ,
                     // this method is repeatedly being called.
+                    console.log('need to renew token.');
                     this.renewTokenRequestBeenSend = true; 
 
                     // important - using then / catch so the method will stay sync .
@@ -114,7 +116,7 @@ export class AgentAuthService {
 
     // update the signed in user data to the db.
     public async onUpdateUserData(userData: 
-        { firstName: string, lastName: string, gender: string, age: number }) {
+        { firstName: string, lastName: string, gender: string, birthDate: any }) {
         try {
             if(this.isSignIn()) {
                 await this.authStrategy.onUpdateUserData(userData);

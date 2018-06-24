@@ -50,12 +50,12 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
                 console.log(res); 
                 if (res != undefined && res.status === 'connected') {
                     
-                    const {authResponse} = res
+                    const {authResponse} = res;
                     console.log(res);
                     // sign in the user using server.
                     return await this._signInToServer({token: authResponse.accessToken});
                 } else {
-                    console.log('The person is not logged into this app or we are unable to tell.')
+                    console.log('The person is not logged into this app or we are unable to tell.');
                 }
             }, { scope: 'public_profile,email' });
     }
@@ -124,7 +124,7 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
         const authRes = this.fbAuth.getAuthResponse();
         console.log(authRes);
         const authuid = authRes.userID;
-        return authValue === authuid;
+        return authValue == authuid;
     }
 
 

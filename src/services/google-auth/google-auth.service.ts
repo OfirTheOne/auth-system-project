@@ -134,7 +134,7 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
     protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
         const { authValue } = res.data;
         const authuid = this.auth2.currentUser.get().getBasicProfile().getId();
-        return authValue === authuid;
+        return authValue == authuid;
     }
 
 
