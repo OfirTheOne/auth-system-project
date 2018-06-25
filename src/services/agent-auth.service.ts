@@ -81,7 +81,7 @@ export class AgentAuthService {
      *  the user is formally signed in the app if :
      *  - the authServise signIn returned true.
      *  - the userDataBase object is init ( this.authStrategy.getProfile() is defined).
-     *  - the authServise token and the sdm token are the same.
+     *  - (not mandetory anymore) the authServise token and the sdm token are the same.
      */
     public isSignIn(): boolean {
         let signStatus;
@@ -90,14 +90,23 @@ export class AgentAuthService {
         } else {
             signStatus = this.authStrategy.isSignIn() && (this.authStrategy.getProfile() != undefined);
             console.log(`from isSignIn - ${JSON.stringify(this.authStrategy.getProfile())}`);
-            
             if(signStatus) {
                 const oldToken = this.sdm.getDeclaredSignData().token;
                 const newToken = this.authStrategy.getToken();
-                console.log(`newToken : ${newToken}`);
-                console.log(`oldToken : ${oldToken}`);
+                
+                if(oldToken != newToken) {
+                    this.sdm.signToken(newToken);
+                }
+            }
+            /*
+
+            if(signStatus) {
+                const oldToken = this.sdm.getDeclaredSignData().token;
+                const newToken = this.authStrategy.getToken();
+                // console.log(`newToken : ${newToken}`);
+                // console.log(`oldToken : ${oldToken}`);
                 let isTokenUpToDate = (newToken == oldToken);
-                console.log(`isTokenUpToDate : ${isTokenUpToDate}`);
+                // console.log(`isTokenUpToDate : ${isTokenUpToDate}`);
                 if(!isTokenUpToDate && !this.renewTokenRequestBeenSend) {
                     // set renewTokenRequestBeenSend to true so the request will not repeat it self ,
                     // this method is repeatedly being called.
@@ -118,6 +127,7 @@ export class AgentAuthService {
 
                 signStatus = signStatus && isTokenUpToDate;
             }
+            */
         }
         return signStatus;
     }
@@ -270,9 +280,8 @@ class SignDeclaretionManeger {
     private readonly tokenKeyName = 'sign_t';
 
     public declareSignData(signData: {providerName: string, token: string}): void {
-        localStorage.setItem(this.providerKeyName, signData.providerName);
-        localStorage.setItem(this.tokenKeyName, signData.token);
-        
+        this.signToken(signData.token);
+        this.signProvider(signData.providerName);
     }
  
     public undeclareSignData(): void {
@@ -289,5 +298,14 @@ class SignDeclaretionManeger {
             providerName: localStorage.getItem(this.providerKeyName), 
             token: localStorage.getItem(this.tokenKeyName)
         };
+    }
+
+
+    public signToken(token: string): void {
+        localStorage.setItem(this.tokenKeyName, token);
+    }
+    
+    public signProvider(providerName: string): void {
+        localStorage.setItem(this.providerKeyName, providerName);
     }
 }
