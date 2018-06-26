@@ -69,7 +69,7 @@ export class CustomAuthStrategyService extends AuthStrategyService {
         return this._buildAuthHeader({token: this.getToken(), providerName: this.getProviderName() });
     }
     
-    protected authenticateServerResponse(res: ServerResponse<AuthResponse> | AuthResponse): boolean {
+    protected authenticateServerResponse(res: AuthResponse): boolean {
         return true;
     }
 

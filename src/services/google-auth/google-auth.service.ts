@@ -132,13 +132,8 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
 
     /************************ protected ************************/  
 
-    protected authenticateServerResponse(res: ServerResponse<AuthResponse> | AuthResponse): boolean {
-        let authValue;
-        if('data' in res ) {
-            authValue = res.data;
-        } else if('authValue' in res) {
-            authValue = res.authValue;
-        }
+    protected authenticateServerResponse(res: AuthResponse): boolean {
+        const authValue = res.authValue;
         const authuid = this.auth2.currentUser.get().getBasicProfile().getId();
         return authValue == authuid;
     }

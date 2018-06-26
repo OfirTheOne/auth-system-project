@@ -89,8 +89,10 @@ export abstract class AuthStrategyService {
         const body = { data: userData };
         try {
             const res = await this.userApi.postUserData(headers, body);
-            if(this.authenticateServerResponse(res))
-            this.userDbProfile = res.user;
+            if(this.authenticateServerResponse(res)) {
+                this.userDbProfile = res.user;
+
+            }
             console.log(res);
             return res;
         } catch (e) {
@@ -103,7 +105,7 @@ export abstract class AuthStrategyService {
 
     /************************ protected ************************/
     
-    protected abstract authenticateServerResponse(res: ServerResponse<AuthResponse> | AuthResponse): boolean;
+    protected abstract authenticateServerResponse(res: AuthResponse): boolean;
 
     protected _buildAuthHeader(headersData: {token: string, providerName: string}): HttpHeaders {
         return new HttpHeaders({ 'x-auth': headersData.token, 'x-provider': headersData.providerName });
@@ -111,23 +113,22 @@ export abstract class AuthStrategyService {
 
     protected async _signInToServer(signInParams: { token?: string,  data?: { email, password } }): Promise<UserDataBase> {
         console.log(`_signInToServer : `,signInParams);
-        let serverRes;
+        let reqData;
 
         // sign in the user using third party services, e.g google, facebook.
         if (signInParams && 'token' in signInParams) {
-            
-            serverRes = await this.userApi.postSignInUser(this.provider, 
-                { idToken: signInParams.token });
+            reqData = { idToken: signInParams.token };
 
         // sign in the user using custom server
         } else if (signInParams && 'data' in signInParams) {
             
-            serverRes = await this.userApi.postSignInUser(this.provider,
-                { email: signInParams.data.email, password: signInParams.data.password });
+            reqData = { email: signInParams.data.email, password: signInParams.data.password };
         }
+        const serverRes = await this.userApi.postSignInUser(this.provider, reqData);
+
         // authenticate the server response. / validating the returned user id. 
         // TODO : throw ex if 'authResponse' is false
-        const authResponse = this.authenticateServerResponse(serverRes.body);
+        const authResponse = this.authenticateServerResponse(serverRes.body.data);
         console.log(authResponse);
         // saving the signed user data in the service.
         this.userDbProfile = serverRes.body.data.user;
