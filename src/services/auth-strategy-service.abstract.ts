@@ -89,6 +89,8 @@ export abstract class AuthStrategyService {
         const body = { data: userData };
         try {
             const res = await this.userApi.postUserData(headers, body);
+            if(this.authenticateServerResponse(res))
+            this.userDbProfile = res.user;
             console.log(res);
             return res;
         } catch (e) {
@@ -101,7 +103,7 @@ export abstract class AuthStrategyService {
 
     /************************ protected ************************/
     
-    protected abstract authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean;
+    protected abstract authenticateServerResponse(res: ServerResponse<AuthResponse> | AuthResponse): boolean;
 
     protected _buildAuthHeader(headersData: {token: string, providerName: string}): HttpHeaders {
         return new HttpHeaders({ 'x-auth': headersData.token, 'x-provider': headersData.providerName });

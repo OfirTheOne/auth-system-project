@@ -65,11 +65,18 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
          * doc : 
          *  https://developers.facebook.com/docs/facebook-login/web#logout
          */
+        const tmpProfile = this.userDbProfile;
         const headers = this.getAuthHeader();
-        const res = await this.fbAuth.logout();
-        this.userDbProfile = undefined;
+
+        try {
+            this.userDbProfile = undefined;
+            const res = await this.fbAuth.logout();
+            console.log(res);
+
+        } catch(e) {
+            this.userDbProfile = tmpProfile;
+        }
         await this._signOutFromServer(headers);
-        console.log(res);
     }
 
     public isSignIn(): boolean {
@@ -118,8 +125,13 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
 
     /************************ protected ************************/
 
-    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
-        const { authValue } = res.data;
+    protected authenticateServerResponse(res: ServerResponse<AuthResponse> | AuthResponse): boolean {
+        let authValue;
+        if('data' in res ) {
+            authValue = res.data;
+        } else if('authValue' in res) {
+            authValue = res.authValue;
+        }
         console.log(authValue);
         const authRes = this.fbAuth.getAuthResponse();
         console.log(authRes);
@@ -157,15 +169,6 @@ export class FacebookAuthStrategyService extends AuthStrategyService {
             js.src = "https://connect.facebook.net/en_US/sdk.js";
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
-    }
-
-    private async fbLogin(params):Promise<FBAuthResponse> {
-        const wraper = await new Promise<FBAuthResponse>((resolve, reject) => {
-            this.fbAuth.login(() => {
-                resolve();
-            }, params);
-        }).catch(err => { throw err });
-        return wraper;
     }
 
 }

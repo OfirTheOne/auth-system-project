@@ -62,13 +62,16 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
 
     public async onSignOut(): Promise<void> {
         console.log(`GAS.onSignOut()`);
-
+        const tmpProfile = this.userDbProfile;
         if (this.isAuth2Init && this.auth2.isSignedIn.get()) {
-
-            const headers = this.getAuthHeader();
-            await this.auth2.signOut(); // this method do have no return value
-            console.log('User signed out.');
             this.userDbProfile = undefined;
+            const headers = this.getAuthHeader();
+            try {
+                await this.auth2.signOut(); // this method do have no return value
+            } catch(e) {
+                this.userDbProfile = tmpProfile;
+            }
+            console.log('User signed out.');
             await this._signOutFromServer(headers);
 
         } else {
@@ -96,8 +99,6 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
         const token = this.getUserAuthData().id_token;
         return this._buildAuthHeader({token, providerName: this.getProviderName() });
     }
-
-
 
 
     public getToken(): string {
@@ -131,8 +132,13 @@ export class GoogleAuthStrategyService extends AuthStrategyService {
 
     /************************ protected ************************/  
 
-    protected authenticateServerResponse(res: ServerResponse<AuthResponse>): boolean {
-        const { authValue } = res.data;
+    protected authenticateServerResponse(res: ServerResponse<AuthResponse> | AuthResponse): boolean {
+        let authValue;
+        if('data' in res ) {
+            authValue = res.data;
+        } else if('authValue' in res) {
+            authValue = res.authValue;
+        }
         const authuid = this.auth2.currentUser.get().getBasicProfile().getId();
         return authValue == authuid;
     }

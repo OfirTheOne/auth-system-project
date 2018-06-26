@@ -2,15 +2,14 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 
+import { EnvironmentService } from './environment/environment.service';
 import { AuthStrategyService } from './auth-strategy-service.abstract';
 import { CustomAuthStrategyService as CAS } from './custom-auth/custom-auth.service';
 import { GoogleAuthStrategyService as GAS } from './google-auth/google-auth.service';
 import { FacebookAuthStrategyService as FAS } from './facebook-auth/facebook-auth.service';
-import { UserApiService as UAS } from './user-api/user-api.service';
 
 import { UserDataBase } from './../models/user-data-base.interface';
 import { Provider } from './../models/provider.enum';
-import { EnvironmentService } from './environment/environment.service';
 
 @Injectable()
 export class AgentAuthService {
@@ -29,8 +28,6 @@ export class AgentAuthService {
 
     // flag, set to true when all auth related resources are loaded.
     private isAuthResInit: boolean = false;
-
-    private renewTokenRequestBeenSend = false;
 
     constructor(
         private custom: CAS, // auth strategy 01
@@ -69,7 +66,6 @@ export class AgentAuthService {
             throw new Error('Auth service is not initialized');
         } else {
             this.sdm.undeclareSignData();
-            this.renewTokenRequestBeenSend = false;
             const res = await this.authStrategy.onSignOut();
             this.userStatusChangeEvent.next();
             return res;
@@ -81,7 +77,6 @@ export class AgentAuthService {
      *  the user is formally signed in the app if :
      *  - the authServise signIn returned true.
      *  - the userDataBase object is init ( this.authStrategy.getProfile() is defined).
-     *  - (not mandetory anymore) the authServise token and the sdm token are the same.
      */
     public isSignIn(): boolean {
         let signStatus;
@@ -98,49 +93,22 @@ export class AgentAuthService {
                     this.sdm.signToken(newToken);
                 }
             }
-            /*
-
-            if(signStatus) {
-                const oldToken = this.sdm.getDeclaredSignData().token;
-                const newToken = this.authStrategy.getToken();
-                // console.log(`newToken : ${newToken}`);
-                // console.log(`oldToken : ${oldToken}`);
-                let isTokenUpToDate = (newToken == oldToken);
-                // console.log(`isTokenUpToDate : ${isTokenUpToDate}`);
-                if(!isTokenUpToDate && !this.renewTokenRequestBeenSend) {
-                    // set renewTokenRequestBeenSend to true so the request will not repeat it self ,
-                    // this method is repeatedly being called.
-                    console.log('need to renew token.');
-                    this.renewTokenRequestBeenSend = true; 
-
-                    // important - using then / catch so the method will stay sync .
-                    this.authStrategy.renewCurToken(newToken, oldToken)
-                        .then((d) => {
-                            this.sdm.declareSignData({
-                                token: newToken,
-                                providerName: this.authStrategy.getProviderName()
-                            });
-                            console.log('renew token request success.', d);
-                        })
-                        .catch((e) => {console.log('renew token request failed.', e);});
-                }
-
-                signStatus = signStatus && isTokenUpToDate;
-            }
-            */
         }
         return signStatus;
     }
 
     // update the signed in user data to the db.
     public async onUpdateUserData(userData: 
-        { firstName: string, lastName: string, gender: string, birthDate: any }) {
+        { firstName: string, lastName: string, gender: string, birthDate: any }): Promise<boolean> {
         try {
             if(this.isSignIn()) {
-                await this.authStrategy.onUpdateUserData(userData);
+                let res = await this.authStrategy.onUpdateUserData(userData);
+                console.log(res);
+                return true;
             }
         } catch (e) {
             console.log(e);
+            return false;
         }
     }
 

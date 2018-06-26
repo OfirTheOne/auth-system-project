@@ -69,15 +69,17 @@ export class UserApiService {
         console.log(`postUserData(${headers}, ${requestBody})`);
         const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'data/';
         try {
-            const res = await this.httpClient.post(queryUrl, requestBody,
-                { headers, responseType: 'text' }).toPromise();
+            const res = await this.httpClient.post<ServerResponse<AuthResponse>>(queryUrl, requestBody,
+                { headers, observe: 'response' }).toPromise();
             console.log(res);
-            return res;
+            return res.body.data;
         } catch (e) {
             throw e;
         }
     }
 
+
+    // not in use at the moment
     public async postRenewToken(headers: HttpHeaders, requestBody: { newToken: string }) {
         console.log(`postRenewToken(${headers}, ${requestBody})`);
         const queryUrl = this.environment.get('API_URL') + this.curSubRoute + 'me/token/';
